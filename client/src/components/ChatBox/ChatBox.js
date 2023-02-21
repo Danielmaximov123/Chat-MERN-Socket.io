@@ -6,10 +6,9 @@ import { getMessages } from './../../redux/action/MessagesAction';
 import ChatSenderComp from './ChatSender';
 import { format } from 'timeago.js';
 
-const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage}) => {
+const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage , online }) => {
     const [userData, setUserData] = useState(null)
     const [messages, setMessages] = useState([])
-    const [messageLen, setMessageLen] = useState(null)
     const scroll = useRef()
 
     
@@ -38,7 +37,6 @@ const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage}) => 
             try {
                 let resp = await getMessages(chat?._id)
                 setMessages(resp)
-                setMessageLen(resp.length)
             } catch (error) {
                 console.error(error)
             }
@@ -47,9 +45,15 @@ const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage}) => 
       })
 
         // Always scroll to last Message
-      useEffect(()=> {
-          scroll.current?.scrollIntoView(true);
-      },[messages])
+      // useEffect(()=> {
+      // },[messages])
+      
+      useEffect(() => {
+        if(scroll.current) {
+          scroll.current?.scrollIntoView();
+        }
+          // scrollDown(scroll.current?.scrollIntoView({ behavior : 'auto' }))
+      },[scroll.current])
 
   return (
     <>
@@ -59,11 +63,11 @@ const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage}) => 
         <StyledBadge
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        variant='dot'
+        variant={online ? 'dot' : 'standard'}
       >
         <Avatar sx={{ width: 56, height: 56 }} alt={userData?.profilePicture} src={userData?.profilePicture ? userData.profilePicture : "/static/images/avatar/1.jpg"} />
       </StyledBadge>
-        <ListItemText primary={<p style={{margin : 0}}>{userData?.username}</p>} secondary="Online" sx={{ marginLeft: '8px' }} />
+        <ListItemText primary={<p style={{margin : 0}}>{userData?.username}</p>} secondary={online ? "Online" : "Offline"} sx={{ marginLeft: '8px' }} />
         </Box>
         <Divider sx={{ marginLeft : '0'}} variant="inset"/>
     </Box>

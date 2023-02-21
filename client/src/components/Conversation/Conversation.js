@@ -4,7 +4,7 @@ import { getUser } from './../../redux/action/UserAction';
 import styled from '../../styles'
 import { StyledBadge } from './../Custom Style/StyledAvatarDot';
 
-const ConversationComp = ({ data , currentUser , select , onlineUsers }) => {
+const ConversationComp = ({ data , currentUser , select , online }) => {
   const [userData, setUserData] = useState(null)
 
   useEffect(() => {
@@ -26,11 +26,11 @@ const ConversationComp = ({ data , currentUser , select , onlineUsers }) => {
       <StyledBadge
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        variant={onlineUsers.find(user => user.userId === userData?._id) && 'dot'}
+        variant={online ? 'dot' : 'standard'}
       >
         <Avatar sx={{ width: 56, height: 56 }} alt={userData?.profilePicture} src={userData?.profilePicture ? userData?.profilePicture : "/static/images/avatar/1.jpg"} />
       </StyledBadge>
-      <ListItemText primary={<p style={{margin : 0}}>{userData?.username}</p>} secondary={onlineUsers.find(user => user.userId === userData?._id) ? "Online" : "Offline"} sx={{ marginLeft: '8px' }} />
+      <ListItemText primary={<p style={{margin : 0}}>{userData?.username}</p>} secondary={online ? "Online" : "Offline"} sx={{ marginLeft: '8px' }} />
       </ListItemButton>
     </ListItem>
   )
