@@ -1,10 +1,9 @@
 import axios from "axios"
-import { apiUrl } from './../api';
 
 export const logIn = (data) => async (dispatch) => {
   dispatch({ type: 'AUTH_LOADING' , payload : true })
   try {
-      let resp = await axios.post(`${apiUrl}/auth/login` , data)
+      let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/login` , data)
       const { success , token , message } = resp.data
       if(success) {
           localStorage.setItem('token' , token)

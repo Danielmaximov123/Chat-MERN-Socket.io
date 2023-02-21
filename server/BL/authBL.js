@@ -1,4 +1,4 @@
-const authSchema = require('../models/authSchema')
+const userSchema = require('../models/userSchema')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
@@ -6,14 +6,14 @@ exports.register = (data) => {
   return new Promise(async (resolve, reject) => {
     const { username, password, email } = data
     try {
-      const emailExist = await authSchema.findOne({email})
+      const emailExist = await userSchema.findOne({email})
       if (emailExist) {
         resolve({
           success: false,
           message: 'There is already a user with this email',
         })
       }
-      const usernameExist = await authSchema.findOne({username})
+      const usernameExist = await userSchema.findOne({username})
       if (usernameExist) {
         resolve({
           success: false,
@@ -36,7 +36,7 @@ exports.register = (data) => {
           message: 'The email you entered is not in email format',
         })
       }
-      const newUser = new authSchema({
+      const newUser = new userSchema({
         username,
         email,
         password: passwordHash,
@@ -45,7 +45,8 @@ exports.register = (data) => {
       const token = jwt.sign({
         id: newUser._id,
         username : newUser.username,
-        email : newUser.email
+        email : newUser.email,
+        profilePicture : newUser.profilePicture
       } , 'SECRET_KEY' , { expiresIn : '1h' })
 
       newUser.save((err) => {
@@ -65,7 +66,7 @@ exports.login = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
         const { email , password } = data
-    const user = await authSchema.findOne({email})
+    const user = await userSchema.findOne({email})
     if(!user) {
         resolve({
             success: false,
@@ -83,7 +84,8 @@ exports.login = (data) => {
     const token = jwt.sign({
         id: user._id,
         username : user.username,
-        email : user.email
+        email : user.email,
+        profilePicture : user.profilePicture
       } , 'SECRET_KEY' , { expiresIn : '1h' })
 
         resolve({success : true , token})

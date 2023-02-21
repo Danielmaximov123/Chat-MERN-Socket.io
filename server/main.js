@@ -16,11 +16,13 @@ app.use('/images', express.static('images'));
 const authRouter = require('./routers/authRouter')
 const chatRouter = require('./routers/chatRouter')
 const messageRouter = require('./routers/messageRouter')
+const userRouter = require('./routers/usersRouter')
 
 // Routers
 app.use('/auth' , authRouter)
 app.use('/chat' , chatRouter)
 app.use('/messages' , messageRouter)
+app.use('/user' , userRouter)
 
 const PORT = 7000 || process.env.PORT
 

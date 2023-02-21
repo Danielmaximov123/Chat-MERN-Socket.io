@@ -2,7 +2,6 @@ const MessageModel = require('../models/messageSchema')
 
 exports.addMessage = (data) => {
     return new Promise(async(resolve ,reject) => {
-        console.log(data);
         const newMessage = new MessageModel(data)
         try {
             newMessage.save((err) => {
