@@ -1,17 +1,17 @@
 import jwtDecode from 'jwt-decode'
 
 const initialState = {
+  chats : [],
   loading: false,
 }
 
-export const authReducer = (state = initialState , action) => {
+export const chatReducer = (state = initialState , action) => {
     switch(action.type) {
-        case 'GET_CHAT' :
-            return { ...state, 
-                token : action.payload,
-                auth : {...jwtDecode(action.payload)}
-            }
-        case 'AUTH_LOADING':
+        case 'GET_CHATS' :
+            return state = { ...state , chats : action.payload }
+        case 'ADD_CHAT' :
+            return  { ...state , chats : [ ...state.chats, action.payload ] }
+        case 'CHAT_LOADING':
             return { ...state, loading : action.payload }
         default:
       return state;

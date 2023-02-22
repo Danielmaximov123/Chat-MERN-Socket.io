@@ -33,6 +33,12 @@ io.on('connection' , (socket) => {
         }
     })
 
+    // New Chat
+    socket.on('create-chat', chat => {
+        console.log('New Chat:', chat);
+        io.emit('receive-chat', chat);
+      })
+
     socket.on('disconnect' , () => {
         activeUsers = activeUsers.filter(user => user.socketId !== socket.id)
         console.log('User Disconnected' , activeUsers);

@@ -1,17 +1,18 @@
 import { Box, Grid } from '@mui/material'
 import style from '../styles'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useRef, useState } from 'react'
 import { getUserChats } from '../redux/action/ChatAction'
 import ConversationComp from '../components/Conversation/Conversation'
 import ChatBoxComp from '../components/ChatBox/ChatBox'
 import { io } from 'socket.io-client'
 import { getAllUsers } from '../redux/action/UserAction'
+import User from '../components/users/User'
 
 const Home = ({ user }) => {
   const dispatch = useDispatch()
-  const [users, setUsers] = useState([])
-  const [chats, setChats] = useState([])
+  const chats = useSelector((state) => state.chats.chats)
+  const users = useSelector((state) => state.users.users)
   const [currentChat, setCurrentChat] = useState(null)
   const [chatSelect, setChatSelect] = useState(null)
   const [sendMessage, setSendMessage] = useState(null)
@@ -20,20 +21,12 @@ const Home = ({ user }) => {
   const [onlineUsers, setOnlineUsers] = useState([])
 
   useEffect(() => {
-    const getChats = async () => {
-      let resp = await getUserChats(user.id)
-      setChats(resp)
-    }
-    getChats()
-  }, [user])
+    dispatch(getUserChats(user.id))
+  }, [user, dispatch])
 
   useEffect(() => {
-    const getUsers = async () => {
-      let resp = await getAllUsers()
-      setUsers(resp)
-    }
-    getUsers()
-  },[user])
+    dispatch(getAllUsers())
+  }, [])
 
   // Socket
   useEffect(() => {
@@ -47,6 +40,10 @@ const Home = ({ user }) => {
     socket.current.emit('new-user-add', user.id)
     socket.current.on('get-users', (users) => {
       setOnlineUsers(users)
+    })
+    socket.current.on('receive-chat', (chat) => {
+      dispatch({ type : 'ADD_CHAT' , chat })
+      dispatch(getUserChats(user.id))
     })
   }, [user])
 
@@ -62,7 +59,7 @@ const Home = ({ user }) => {
     return online ? true : false
   }
 
-  let usersWithoutMe = users.filter(i => i._id !== user?.id) 
+  let usersWithoutMe = users.filter((i) => i._id !== user?.id)
 
   return (
     <Box sx={style.mainBoxInChatPage}>
@@ -80,34 +77,39 @@ const Home = ({ user }) => {
               paddingLeft: '0.2rem !important',
             }}
           >
-            {chats.map((chat) => {
-              return (
-                <Box
-                  onClick={() => {
-                    setCurrentChat(chat)
-                    setChatSelect(chat._id)
-                  }}
-                  key={chat._id}
-                >
-                  <ConversationComp
-                    select={chatSelect}
-                    data={chat}
-                    currentUser={user.id}
-                    online={checkOnlineStatus(chat)}
-                  />
-                </Box>
-              )
-            })}
-            {
-              usersWithoutMe.length >  0 &&
+            {usersWithoutMe.length > 0 && (
               <>
-              {
-                usersWithoutMe?.map(i => {
-                  console.log(i);
-                })
-              }
-              </> 
-            }
+                {usersWithoutMe?.map((member) => {
+                  const matchingChat = chats.find((chat) =>
+                    chat?.members.includes(member._id),
+                  )
+                  if (matchingChat) {
+                    return (
+                      <Box
+                        key={matchingChat._id}
+                        onClick={() => {
+                          setCurrentChat(matchingChat)
+                          setChatSelect(matchingChat._id)
+                        }}
+                      >
+                        <ConversationComp
+                          select={chatSelect}
+                          data={matchingChat}
+                          currentUser={user.id}
+                          online={checkOnlineStatus(matchingChat)}
+                        />
+                      </Box>
+                    )
+                  } else {
+                    return (
+                      <Box key={member._id}>
+                        <User socket={socket} currentUser={user.id} member={member} />
+                      </Box>
+                    )
+                  }
+                })}
+              </>
+            )}
           </Grid>
           {/* right side chat */}
           <Grid

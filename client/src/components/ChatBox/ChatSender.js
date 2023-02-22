@@ -1,5 +1,5 @@
 import { Box, Button, Chip, IconButton } from '@mui/material'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import InputEmoji from 'react-input-emoji'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import SendIcon from '@mui/icons-material/Send'
@@ -7,6 +7,7 @@ import { postMessages } from '../../redux/action/MessagesAction'
 
 const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => {
   const [newMessage, setNewMessage] = useState('')
+  const imageRef = useRef();
 
   const handleChange = (e) => {
     setNewMessage(e)
@@ -33,10 +34,11 @@ const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => 
     setSendMessage({..."message", receiverId})
   }
 
+
   return (
       <Box component='form' onSubmit={handleSubmit}>
     <Box display="flex" sx={{ padding: '0.5rem 0rem', display: 'flex' }}>
-      <IconButton sx={{ marginLeft: '0.5rem' }}>
+      <IconButton onClick={() => imageRef.current.click()} sx={{ marginLeft: '0.5rem' }}>
         <AddBoxIcon />
       </IconButton>
       <InputEmoji value={newMessage} onChange={handleChange} />
@@ -55,6 +57,13 @@ const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => 
         variant="outlined"
         icon={<SendIcon color='#07ae12ce'/>}
       />
+      <input
+                type="file"
+                name=""
+                id=""
+                style={{ display: "none" }}
+                ref={imageRef}
+              />
       </Box>
     </Box>
   )

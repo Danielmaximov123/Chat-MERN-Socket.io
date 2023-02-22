@@ -5,6 +5,7 @@ import { StyledBadge } from '../Custom Style/StyledAvatarDot'
 import { getMessages } from './../../redux/action/MessagesAction';
 import ChatSenderComp from './ChatSender';
 import { format } from 'timeago.js';
+import ChatSend from './chatSend';
 
 const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage , online }) => {
     const [userData, setUserData] = useState(null)
@@ -102,6 +103,7 @@ const ChatBoxComp = ({chat , currentUser , setSendMessage , receiveMessage , onl
     </Box>
     {/* Chat Sender */}
         <ChatSenderComp setSendMessage={setSendMessage} setMessages={setMessages} chat={chat} currentUser={currentUser}/>
+        {/* <ChatSend setSendMessage={setSendMessage} setMessages={setMessages} chat={chat} currentUser={currentUser}/> */}
     </>
   )
 }

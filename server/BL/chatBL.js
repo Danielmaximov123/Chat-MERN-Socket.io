@@ -19,6 +19,16 @@ exports.createChat = (data) => {
     })
 }
 
+exports.getAllChats = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const chat = await ChatModel.find({});
+            resolve(chat);
+          } catch (error) {
+            resolve(error);
+          }
+    });
+}
 exports.userChats = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {

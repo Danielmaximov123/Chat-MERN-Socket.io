@@ -9,6 +9,7 @@ const ConversationComp = ({ data , currentUser , select , online }) => {
 
   useEffect(() => {
     const userId = data.members.find(id => !id.includes(currentUser))
+
     const getUserData = async () => {
       try {
         let data = await getUser(userId)
@@ -21,6 +22,7 @@ const ConversationComp = ({ data , currentUser , select , online }) => {
   },[])
 
   return (
+    <>
     <ListItem disablePadding sx={{ display: 'block' }} >
       <ListItemButton selected={select === data._id} sx={{margin: '1rem', borderRadius: '1rem'}}>
       <StyledBadge
@@ -33,6 +35,7 @@ const ConversationComp = ({ data , currentUser , select , online }) => {
       <ListItemText primary={<p style={{margin : 0}}>{userData?.username}</p>} secondary={online ? "Online" : "Offline"} sx={{ marginLeft: '8px' }} />
       </ListItemButton>
     </ListItem>
+    </>
   )
 }
 

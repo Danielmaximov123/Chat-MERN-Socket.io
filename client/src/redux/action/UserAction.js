@@ -5,7 +5,7 @@ export const getUser = async (id)  => {
     return resp.data
 }
 
-export const getAllUsers = async ()  => {
+export const getAllUsers = () => async dispatch => {
     let resp = await axios.get(`${process.env.REACT_APP_URL_API}/user`)
-    return resp.data
+    dispatch({ type : 'GET_USERS' , payload : resp.data })
 }

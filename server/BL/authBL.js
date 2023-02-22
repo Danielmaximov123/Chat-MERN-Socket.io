@@ -90,7 +90,7 @@ exports.login = (data) => {
 
         resolve({success : true , token})
     } catch (error) {
-        reject({message : error.message})
+      resolve({message : error.message})
     }
   })
 }
