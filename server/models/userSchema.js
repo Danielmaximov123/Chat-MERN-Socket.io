@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    username : { type : String , require : true , trim : true },
+    fName : { type : String , require : true },
+    lName : { type : String , require : true },
+    displayName : { type : String , require : true },
     email : { type : String , require : true , unique : true },
     profilePicture : { type : String , default : null },
     password : { type : String , require : true },

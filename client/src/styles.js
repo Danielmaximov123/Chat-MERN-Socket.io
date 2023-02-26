@@ -25,7 +25,6 @@ exports.mainBoxInChatPage = {
   right: '0',
   bottom: '0',
   left: '0',
-  zIndex: '50',
 }
 
 exports.userInConversation = {

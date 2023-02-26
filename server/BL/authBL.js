@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 
 exports.register = (data) => {
   return new Promise(async (resolve, reject) => {
-    const { username, password, email } = data
+    const { fName , lName , displayName , password, email } = data
     try {
       const emailExist = await userSchema.findOne({email})
       if (emailExist) {
@@ -37,17 +37,12 @@ exports.register = (data) => {
         })
       }
       const newUser = new userSchema({
-        username,
+        fName,
+        lName,
+        displayName,
         email,
         password: passwordHash,
       })
-
-      const token = jwt.sign({
-        id: newUser._id,
-        username : newUser.username,
-        email : newUser.email,
-        profilePicture : newUser.profilePicture
-      } , 'SECRET_KEY' , { expiresIn : '1h' })
 
       newUser.save((err) => {
         if(err) {
@@ -83,7 +78,9 @@ exports.login = (data) => {
 
     const token = jwt.sign({
         id: user._id,
-        username : user.username,
+        fName : user.fName,
+        lName : user.lName,
+        displayName : user.displayName,
         email : user.email,
         profilePicture : user.profilePicture
       } , 'SECRET_KEY' , { expiresIn : '1h' })

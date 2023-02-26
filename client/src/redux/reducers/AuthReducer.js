@@ -20,6 +20,9 @@ export const authReducer = (state = initialState , action) => {
                 token : action.payload,
                 auth : {...jwtDecode(action.payload)}
             }
+        case 'LOGOUT_AUTH':
+            localStorage.clear()
+            return { ...state, auth : null }
         default:
       return state;
     }

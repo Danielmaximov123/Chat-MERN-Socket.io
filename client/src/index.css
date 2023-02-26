@@ -2,12 +2,12 @@
     font-family: 'Assistant' ,sans-serif;
   }
 
-  /* .Chat {
+  .Chat {
     position: relative;
     display: grid;
     grid-template-columns: 22% auto;
     gap: 1rem;
-  } */
+  }
 
   .ChatBox-container {
     background: var(--cardColor);

@@ -8,6 +8,8 @@ import ChatBoxComp from '../components/ChatBox/ChatBox'
 import { io } from 'socket.io-client'
 import { getAllUsers } from '../redux/action/UserAction'
 import User from '../components/users/User'
+import UserInMenu from '../components/User/User In Menu'
+import EditUser from '../components/User/Edit User'
 
 const Home = ({ user }) => {
   const dispatch = useDispatch()
@@ -17,8 +19,10 @@ const Home = ({ user }) => {
   const [chatSelect, setChatSelect] = useState(null)
   const [sendMessage, setSendMessage] = useState(null)
   const [receiveMessage, setReceiveMessage] = useState(null)
+  const [messages, setMessages] = useState([])
   const socket = useRef()
   const [onlineUsers, setOnlineUsers] = useState([])
+  const [editUser, setEditUser] = useState(false)
 
   useEffect(() => {
     dispatch(getUserChats(user.id))
@@ -63,9 +67,9 @@ const Home = ({ user }) => {
 
   return (
     <Box sx={style.mainBoxInChatPage}>
-      <h2 style={{ textAlign: 'center' }}>Chat</h2>
+      <Box></Box>
       <Box sx={{ width: '100%' }}>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{margin : 'auto !important'}}>
           {/* left side chat */}
           <Grid
             item
@@ -77,7 +81,15 @@ const Home = ({ user }) => {
               paddingLeft: '0.2rem !important',
             }}
           >
-            {usersWithoutMe.length > 0 && (
+            <Box sx={{width : '100%' , display: 'flow-root' , padding: '1rem 0' , borderBottom : '2px dashed #009e0736' }}>
+            <Box sx={{width: '50%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
+            <Box sx={{ float: 'right' , display: 'inline-flex' , margin: '0 2rem'}}>
+              <UserInMenu user={user} editUser={editUser} setEditUser={setEditUser}/>
+            
+            </Box>
+            </Box>
+            <Box>
+              {usersWithoutMe.length > 0 && (
               <>
                 {usersWithoutMe?.map((member) => {
                   const matchingChat = chats.find((chat) =>
@@ -110,6 +122,7 @@ const Home = ({ user }) => {
                 })}
               </>
             )}
+            </Box>
           </Grid>
           {/* right side chat */}
           <Grid
@@ -121,9 +134,12 @@ const Home = ({ user }) => {
               marginLeft: '1rem',
               paddingLeft: '0rem !important',
             }}
+
           >
-            {
-              <Box className="ChatBox-container">
+            <Box>
+              {
+                editUser ? <EditUser user={user}/> :
+                <Box className="ChatBox-container">
                 {chatSelect !== null ? (
                   <ChatBoxComp
                     online={checkOnlineStatus(currentChat)}
@@ -131,6 +147,8 @@ const Home = ({ user }) => {
                     currentUser={user.id}
                     setSendMessage={setSendMessage}
                     receiveMessage={receiveMessage}
+                    setMessages={setMessages}
+                    messages={messages}
                   />
                 ) : (
                   <span className="chatbox-empty-message">
@@ -138,7 +156,9 @@ const Home = ({ user }) => {
                   </span>
                 )}
               </Box>
-            }
+              }
+            
+            </Box>
           </Grid>
         </Grid>
       </Box>
