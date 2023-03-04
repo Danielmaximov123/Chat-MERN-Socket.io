@@ -4,20 +4,13 @@ const bcrypt = require('bcryptjs')
 
 exports.register = (data) => {
   return new Promise(async (resolve, reject) => {
-    const { fName , lName , displayName , password, email } = data
+    const { fName , lName , password, email } = data
     try {
       const emailExist = await userSchema.findOne({email})
       if (emailExist) {
         resolve({
           success: false,
           message: 'There is already a user with this email',
-        })
-      }
-      const usernameExist = await userSchema.findOne({username})
-      if (usernameExist) {
-        resolve({
-          success: false,
-          message: 'There is already a user with this username',
         })
       }
       if (password.length < 8 || password.length > 16) {
@@ -39,12 +32,12 @@ exports.register = (data) => {
       const newUser = new userSchema({
         fName,
         lName,
-        displayName,
+        displayName : `${fName} ${lName}`,
         email,
         password: passwordHash,
       })
 
-      newUser.save((err) => {
+      newUser.save(async(err) => {
         if(err) {
             reject(err)
         } else {
@@ -82,7 +75,8 @@ exports.login = (data) => {
         lName : user.lName,
         displayName : user.displayName,
         email : user.email,
-        profilePicture : user.profilePicture
+        profilePicture : user.profilePicture,
+        password : user.password
       } , 'SECRET_KEY' , { expiresIn : '1h' })
 
         resolve({success : true , token})

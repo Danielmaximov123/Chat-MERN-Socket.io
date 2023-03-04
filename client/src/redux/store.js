@@ -4,13 +4,15 @@ import thunk from "redux-thunk";
 import { authReducer } from './reducers/AuthReducer';
 import { chatReducer } from "./reducers/chatsReducer";
 import { usersReducer } from "./reducers/usersReducers";
+import { messagesReducer } from './reducers/messagesReducer';
 
 
 
 const reducers = combineReducers({
     auth : authReducer,
     chats : chatReducer,
-    users : usersReducer
+    users : usersReducer,
+    messages : messagesReducer
 })
 
 const store = createStore(reducers , composeWithDevTools(applyMiddleware(thunk)))

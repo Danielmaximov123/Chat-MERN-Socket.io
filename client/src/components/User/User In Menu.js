@@ -1,12 +1,13 @@
-import { Avatar, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Avatar, Box, CircularProgress, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material'
 import Logout from '@mui/icons-material/Logout';
 
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const UserInMenu = ({ user , setEditUser }) => {
+const UserInMenu = ({ user , setEditUser , setChatSelect , socket}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const dispatch = useDispatch()
+    const {loadingUpdate} = useSelector(state => state.users)
 
   return (
     <>
@@ -15,17 +16,22 @@ const UserInMenu = ({ user , setEditUser }) => {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         size="small"
         sx={{ ml: 2 }}
+          className='avatar-img'
       >
-        <Tooltip placement='left' title={user?.username}>
+        {
+          loadingUpdate ? <CircularProgress sx={{ color : '#FFFFFF' }} style={{ width: "1.5rem", height: "1.5rem" , margin : '0.5rem'}}/> :
+        <Tooltip placement='left' title={user?.displayName}>
         <Avatar
           src={
-            user?.profilePicture
-              ? user?.profilePicture
-              : '/static/images/avatar/1.jpg'
+            user?.profilePicture?.url
+            ? user?.profilePicture?.url
+            : 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true'
           }
-        />
+          />
         </Tooltip>
+        }
       </IconButton>
+
     </Box>
     <Menu
         anchorEl={anchorEl}
@@ -62,11 +68,15 @@ const UserInMenu = ({ user , setEditUser }) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={() => {setEditUser(true)}}>
-          <Avatar /> My account
+        <MenuItem onClick={() => {setEditUser(true) ; setChatSelect(null)}}>
+          <Avatar src={
+            user?.profilePicture?.url
+            ? user?.profilePicture?.url
+            : 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true'
+          }/> My account
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'})}}>
+        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'}); socket.current.disconnect()}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

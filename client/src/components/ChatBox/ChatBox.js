@@ -1,28 +1,24 @@
-import { Avatar, Box, Divider, Grid, ListItemText } from '@mui/material'
+import { Avatar, Box, CircularProgress, Divider, Grid, ListItemText } from '@mui/material'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { getUser } from '../../redux/action/UserAction'
 import { StyledBadge } from '../Custom Style/StyledAvatarDot'
 import { getMessages } from './../../redux/action/MessagesAction'
 import ChatSenderComp from './ChatSender'
 import { format } from 'timeago.js'
+import { useDispatch } from 'react-redux'
 
 const ChatBoxComp = ({
   chat,
   currentUser,
-  setSendMessage,
-  receiveMessage,
   online,
   messages,
-  setMessages
+  setMessages,
+  loading,
+  socket
 }) => {
   const [userData, setUserData] = useState(null)
   const scroll = useRef()
-
-  useEffect(() => {
-    if (receiveMessage !== null && receiveMessage?.chatId === chat?._id) {
-      setMessages([...messages, receiveMessage])
-    }
-  }, [receiveMessage])
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => !id.includes(currentUser))
@@ -39,32 +35,23 @@ const ChatBoxComp = ({
 
   // fetch messages
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        let resp = await getMessages(chat?._id)
-        setMessages(resp)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    chat !== null && fetchMessages()
-  })
+    chat !== null && dispatch(getMessages(chat?._id))
+  },[dispatch , chat])
 
-  // Always scroll to last Message
-  // useEffect(()=> {
-  // },[messages])
 
   useEffect(() => {
     if (scroll.current) {
-      scroll.current?.scrollIntoView()
+      scroll.current?.scrollIntoView({ behavior : 'smooth' })
     }
-    // scrollDown(scroll.current?.scrollIntoView({ behavior : 'auto' }))
-  }, [scroll.current])
+  }, [messages])
 
   return (
     <>
-      {/* Chat Header */}
-      <Box>
+    {
+      loading ? <Box sx={{margin : 'auto'}}><CircularProgress sx={{height : '4rem' , width : '4rem'}} color="success" /></Box> :
+      <>
+            {/* Chat Header */}
+            <Box>
         <Box display="inline-flex" sx={{ margin: '1rem' }}>
           <StyledBadge
             overlap="circular"
@@ -73,16 +60,16 @@ const ChatBoxComp = ({
           >
             <Avatar
               sx={{ width: 56, height: 56 }}
-              alt={userData?.profilePicture}
+              alt={userData?.profilePicture?.url}
               src={
-                userData?.profilePicture
-                  ? userData.profilePicture
-                  : '/static/images/avatar/1.jpg'
+                userData?.profilePicture?.url
+                  ? userData.profilePicture?.url
+                  : 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true'
               }
             />
           </StyledBadge>
           <ListItemText
-            primary={<p style={{ margin: 0 }}>{userData?.username}</p>}
+            primary={<p style={{ margin: 0 }}>{userData?.displayName}</p>}
             secondary={online ? 'Online' : 'Offline'}
             sx={{ marginLeft: '8px' }}
           />
@@ -101,28 +88,25 @@ const ChatBoxComp = ({
                   sx={{
                     padding: '1rem',
                     alignSelf:
-                      message.senderId === currentUser
+                      message?.senderId === currentUser
                         ? 'flex-end'
                         : 'flex-start',
                     display: 'inline-grid',
                     border:
-                      message.senderId === currentUser
+                      message?.senderId === currentUser
                         ? '1px #07ae12ce solid'
                         : '1px #696969ab solid',
                     color:
-                      message.senderId === currentUser
+                      message?.senderId === currentUser
                         ? '#07ae12ce'
                         : '#696969ab',
                     borderRadius: '1rem 1rem 0rem 1rem',
                     gap: '0.5rem',
                   }}
-                  // className={
-                  //   message?.senderId === currentUser ? 'message own' : 'message'
-                  // }
                 >
-                  <span>{message.text}</span>
+                  <span>{message?.text}</span>
                   <span style={{ fontSize: '0.7rem', alignSelf: 'end' }}>
-                    {format(message.createdAt)}
+                    {format(message?.createdAt)}
                   </span>
                 </Box>
               )
@@ -132,11 +116,13 @@ const ChatBoxComp = ({
       </Box>
       {/* Chat Sender */}
           <ChatSenderComp
-            setSendMessage={setSendMessage}
             setMessages={setMessages}
             chat={chat}
             currentUser={currentUser}
+            socket={socket}
           />
+      </>
+    }
     </>
   )
 }

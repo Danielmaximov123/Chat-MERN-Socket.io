@@ -6,11 +6,9 @@ require('./config/db')
 
 const app = express()
 app.use(cors())
-app.use(bodyParser.json({ limit: '30mb' , extended : true }))
-app.use(bodyParser.urlencoded({ limit: '30mb' , extended : true }))
-// to serve images inside public folder
-app.use(express.static('public')); 
-app.use('/images', express.static('images'));
+app.use(express.json({limit: "10mb", extended: true}))
+app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
+app.use(express.json())
 
 // Routers Path
 const authRouter = require('./routers/authRouter')

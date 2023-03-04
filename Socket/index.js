@@ -11,14 +11,13 @@ let activeUsers = []
 io.on('connection' , (socket) => {
     // add new User 
     socket.on('new-user-add' , newUserId => {
-        console.log(newUserId);
         if(!activeUsers.some(user => user.userId === newUserId)) {
             activeUsers.push({
                 userId : newUserId,
                 socketId : socket.id
             })
         }
-        console.log('Connected Users' , activeUsers);
+        activeUsers
         io.emit('get-users' , activeUsers)
     })
 
@@ -26,22 +25,31 @@ io.on('connection' , (socket) => {
     socket.on('send-message' , data => {
         const {receiverId} = data
         const user = activeUsers.find(user => user.userId === receiverId)
-        console.log(`Sending from socket to ${receiverId}`);
-        console.log("Data" , data);
+        console.log(receiverId);
+        console.log(activeUsers);
         if(user) {
-            io.to(user.socketId).emit('receive-message' , data)
+            io.to(user.socketId).emit('receive-message' , data.data)
         }
+    })
+
+    // Update User
+    socket.on('update-user-details' , updatedUser => {
+        io.emit('user-updated' , updatedUser)
     })
 
     // New Chat
     socket.on('create-chat', chat => {
-        console.log('New Chat:', chat);
         io.emit('receive-chat', chat);
       })
 
+    // User Logout
+    socket.on('user-logout', (userId) => {
+      activeUsers = activeUsers.filter((user) => user.userId !== userId);
+      io.emit('get-users', activeUsers);
+    });
+
     socket.on('disconnect' , () => {
         activeUsers = activeUsers.filter(user => user.socketId !== socket.id)
-        console.log('User Disconnected' , activeUsers);
         io.emit('get-users' , activeUsers)
     })
 })

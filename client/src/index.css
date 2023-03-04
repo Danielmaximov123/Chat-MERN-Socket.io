@@ -71,3 +71,65 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+.avatar-img {
+  background: linear-gradient(270deg, #3fa1a9, #79f1a4);
+  border-radius: 50%;
+  padding: 1px !important;
+}
+
+.MuiBadge-root {
+  background: linear-gradient(270deg, #3fa1a9, #79f1a4);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+#uploadPicture {
+  width: 144px;
+  height: 144px;
+  margin: auto;
+  display: flex;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 50%;
+  -webkit-box-align: center;
+  align-items: center;
+  position: relative;
+  -webkit-box-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  background: linear-gradient(270deg, #3fa1a9, #79f1a4);
+}
+
+#spanBack {
+  line-height: 1;
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  z-index: 8;
+  border-radius: 50%;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+}
+
+#upIMG {
+  display: flex;
+  border-radius: 50%;
+  position: absolute;
+  -webkit-box-align: center;
+  align-items: center;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  justify-content: center;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  z-index: 9;
+  opacity: 0;
+  color: rgb(255, 255, 255);
+  background-color: rgba(22, 28, 36, 0.64);
+}
+
+#upIMG:hover {
+  opacity: 1;
+}

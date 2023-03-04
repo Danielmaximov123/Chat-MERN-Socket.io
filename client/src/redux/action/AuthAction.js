@@ -1,4 +1,5 @@
 import axios from "axios"
+import { getMyUser } from "./UserAction"
 
 export const logIn = (data) => async (dispatch) => {
   dispatch({ type: 'AUTH_LOADING' , payload : true })
@@ -7,6 +8,7 @@ export const logIn = (data) => async (dispatch) => {
       const { success , token , message } = resp.data
       if(success) {
           localStorage.setItem('token' , token)
+          await getMyUser(token , dispatch)
           dispatch({ type: 'GET_LOGIN', payload: token })
           dispatch({ type: 'AUTH_LOADING' , payload : false })
         } else {

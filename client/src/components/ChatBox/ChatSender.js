@@ -4,8 +4,10 @@ import InputEmoji from 'react-input-emoji'
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send'
 import { postMessages } from '../../redux/action/MessagesAction'
+import { useDispatch } from 'react-redux';
 
-const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => {
+const ChatSenderComp = ({currentUser , chat  , socket}) => {
+  const dispatch = useDispatch()
   const [newMessage, setNewMessage] = useState('')
   const [file, setFile] = useState(null)
 
@@ -24,15 +26,12 @@ const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => 
     // send message to DB 
 
     try {
-        let data = await postMessages(message)
-        setMessages([...'messages', data])
+      const receiverId = chat.members.find(id => id !== currentUser)
+      dispatch(postMessages(message , socket , receiverId))
         setNewMessage('')
     } catch (error) {
         console.error(error)
     }
-    // send message to RT
-    const receiverId = chat.members.find(id => id !== currentUser)
-    setSendMessage({..."message", receiverId})
   }
 
   const handleFile = (e) => {
@@ -45,7 +44,7 @@ const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => 
 
   return (
     <Grid container spacing={3}>
-      <Grid xs={12} sx={{ margin: 'auto' }}>
+      <Grid item xs={12} sx={{ margin: 'auto' }}>
           {file && (
             <Box sx={{ margin: 'auto', textAlign: 'center' }}>
               <span>
@@ -65,7 +64,7 @@ const ChatSenderComp = ({currentUser , chat , setMessages , setSendMessage}) => 
             </Box>
           )}
         </Grid>
-        <Grid xs={12} sx={{ padding: '0rem 2rem' }}>
+        <Grid item xs={12} sx={{ padding: '0rem 2rem' }}>
     <Box>
     <Box component='form' onSubmit={handleSubmit}>
   <Box display="flex" sx={{ padding: '0rem 0rem', display: 'flex' }}>

@@ -11,159 +11,163 @@ import User from '../components/users/User'
 import UserInMenu from '../components/User/User In Menu'
 import EditUser from '../components/User/Edit User'
 
-const Home = ({ user }) => {
+const Home = ({ user , auth}) => {
   const dispatch = useDispatch()
   const chats = useSelector((state) => state.chats.chats)
-  const users = useSelector((state) => state.users.users)
+  const {users, loadingUpdate, userLoading} = useSelector((state) => state.users)  
   const [currentChat, setCurrentChat] = useState(null)
   const [chatSelect, setChatSelect] = useState(null)
-  const [sendMessage, setSendMessage] = useState(null)
-  const [receiveMessage, setReceiveMessage] = useState(null)
-  const [messages, setMessages] = useState([])
+  const messages = useSelector((state) => state.messages.messages)
+  const messagesLoading = useSelector((state) => state.messages.loading)
   const socket = useRef()
   const [onlineUsers, setOnlineUsers] = useState([])
   const [editUser, setEditUser] = useState(false)
 
   useEffect(() => {
-    dispatch(getUserChats(user.id))
-  }, [user, dispatch])
+    dispatch(getUserChats(user?._id))
+  }, [user])
 
   useEffect(() => {
     dispatch(getAllUsers())
-  }, [])
-
+  }, [dispatch])
+  
   // Socket
   useEffect(() => {
-    if (sendMessage !== null) {
-      socket.current.emit('send-message', sendMessage)
-    }
-  }, [sendMessage])
-
-  useEffect(() => {
     socket.current = io(process.env.REACT_APP_SOCKET_IO)
-    socket.current.emit('new-user-add', user.id)
+    socket.current.emit('new-user-add', auth?.id)
     socket.current.on('get-users', (users) => {
       setOnlineUsers(users)
     })
     socket.current.on('receive-chat', (chat) => {
       dispatch({ type : 'ADD_CHAT' , chat })
-      dispatch(getUserChats(user.id))
+      dispatch(getUserChats(user._id))
     })
-  }, [user])
+  }, [auth])
 
   useEffect(() => {
     socket.current.on('receive-message', (data) => {
-      setReceiveMessage(data)
+      dispatch({ type : 'ADD_MESSAGE' , payload : data })
     })
   }, [])
 
+useEffect(() => {
+  socket.current.on('user-updated', (updatedUserDetails) => {
+    // dispatch an action to update the user details in the state
+    console.log(updatedUserDetails); // its print but after its send to dispatch its not render the update details
+    dispatch({ type: 'UPDATE_USER', payload: updatedUserDetails });
+  });
+}, []);
+
+
   const checkOnlineStatus = (chat) => {
-    const chatMember = chat.members.find((member) => member !== user?.id)
+    const chatMember = chat.members.find((member) => member !== user?._id)
     const online = onlineUsers.find((user) => user.userId === chatMember)
     return online ? true : false
   }
 
-  let usersWithoutMe = users.filter((i) => i._id !== user?.id)
+  let usersWithoutMe = users?.filter((i) => i?._id !== user?._id)
 
   return (
-    <Box sx={style.mainBoxInChatPage}>
-      <Box></Box>
-      <Box sx={{ width: '100%' }}>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{margin : 'auto !important'}}>
-          {/* left side chat */}
-          <Grid
-            item
-            xs={3.5}
-            sx={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '1rem',
-              marginLeft: '1rem',
-              paddingLeft: '0.2rem !important',
-            }}
-          >
-            <Box sx={{width : '100%' , display: 'flow-root' , padding: '1rem 0' , borderBottom : '2px dashed #009e0736' }}>
-            <Box sx={{width: '50%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
-            <Box sx={{ float: 'right' , display: 'inline-flex' , margin: '0 2rem'}}>
-              <UserInMenu user={user} editUser={editUser} setEditUser={setEditUser}/>
-            
-            </Box>
-            </Box>
-            <Box>
-              {usersWithoutMe.length > 0 && (
-              <>
-                {usersWithoutMe?.map((member) => {
-                  const matchingChat = chats.find((chat) =>
-                    chat?.members.includes(member._id),
-                  )
-                  if (matchingChat) {
-                    return (
-                      <Box
-                        key={matchingChat._id}
-                        onClick={() => {
-                          setCurrentChat(matchingChat)
-                          setChatSelect(matchingChat._id)
-                        }}
-                      >
-                        <ConversationComp
-                          select={chatSelect}
-                          data={matchingChat}
-                          currentUser={user.id}
-                          online={checkOnlineStatus(matchingChat)}
-                        />
-                      </Box>
-                    )
-                  } else {
-                    return (
-                      <Box key={member._id}>
-                        <User socket={socket} currentUser={user.id} member={member} />
-                      </Box>
-                    )
-                  }
-                })}
-              </>
-            )}
-            </Box>
-          </Grid>
-          {/* right side chat */}
-          <Grid
-            item
-            xs={7.5}
-            sx={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '1rem',
-              marginLeft: '1rem',
-              paddingLeft: '0rem !important',
-            }}
-
-          >
-            <Box>
-              {
-                editUser ? <EditUser user={user}/> :
-                <Box className="ChatBox-container">
-                {chatSelect !== null ? (
-                  <ChatBoxComp
-                    online={checkOnlineStatus(currentChat)}
-                    chat={currentChat}
-                    currentUser={user.id}
-                    setSendMessage={setSendMessage}
-                    receiveMessage={receiveMessage}
-                    setMessages={setMessages}
-                    messages={messages}
-                  />
-                ) : (
-                  <span className="chatbox-empty-message">
-                    Tap on a Chat to start conversation...
-                  </span>
-                )}
+      <Box sx={style.mainBoxInChatPage}>
+        <Box sx={{ width: '100%' }}>
+          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{margin : 'auto !important'}}>
+            {/* left side chat */}
+            <Grid
+              item
+              xs={3.5}
+              sx={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '1rem',
+                marginLeft: '1rem',
+                paddingLeft: '0.2rem !important',
+              }}
+            >
+              <Box sx={{width : '100%' , display: 'flow-root' , padding: '1rem 0' , borderBottom : '2px dashed #009e0736' }}>
+              <Box sx={{width: '50%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
+              <Box sx={{ float: 'right' , display: 'inline-flex' , margin: '0 2rem'}}>
+                <UserInMenu socket={socket} setChatSelect={setChatSelect} user={user} editUser={editUser} setEditUser={setEditUser}/>
               </Box>
-              }
-            
-            </Box>
+              </Box>
+              <Box>
+                {usersWithoutMe?.length > 0 && (
+                <>
+                {/* here its not update */}
+                  {usersWithoutMe?.map((member) => {
+                    const matchingChat = chats.find((chat) =>
+                    chat?.members.includes(member?._id)
+                  )
+                  
+                    if (matchingChat) {
+                      return (
+                        <Box
+                          key={matchingChat._id}
+                          onClick={() => {
+                            setCurrentChat(matchingChat)
+                            setChatSelect(matchingChat._id)
+                            setEditUser(false)
+                          }}
+                        >
+                          <ConversationComp
+                            select={chatSelect}
+                            data={matchingChat}
+                            currentUser={user?._id}
+                            online={checkOnlineStatus(matchingChat)}
+                          />
+                        </Box>
+                      )
+                    } else {
+                      return (
+                        <Box key={member?._id}>
+                          <User socket={socket} currentUser={user?._id} member={member} />
+                        </Box>
+                      )
+                    }
+                  })}
+                </>
+              )}
+              </Box>
+            </Grid>
+            {/* right side chat */}
+            <Grid
+              item
+              xs={7.5}
+              sx={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '1rem',
+                marginLeft: '1rem',
+                paddingLeft: '0rem !important',
+              }}
+  
+            >
+              <Box>
+                  <Box className="ChatBox-container">
+                {
+                    editUser ? <EditUser socket={socket} /> :
+                    <>
+                      {chatSelect !== null ? 
+                    <ChatBoxComp
+                      online={checkOnlineStatus(currentChat)}
+                      chat={currentChat}
+                      currentUser={user?._id}
+                      messages={messages}
+                      loading={messagesLoading}
+                      socket={socket}
+                    />
+                   : 
+                    <span className="chatbox-empty-message">
+                      Tap on a Chat to start conversation...
+                    </span>
+                    }
+                    </>
+                  }
+                    </Box>
+              
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Box>
-    </Box>
-  )
-}
+    )
+  }
 
 export default Home

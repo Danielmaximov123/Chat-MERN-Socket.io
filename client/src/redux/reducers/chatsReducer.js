@@ -1,4 +1,3 @@
-import jwtDecode from 'jwt-decode'
 
 const initialState = {
   chats : [],
@@ -11,6 +10,7 @@ export const chatReducer = (state = initialState , action) => {
             return state = { ...state , chats : action.payload }
         case 'ADD_CHAT' :
             return  { ...state , chats : [ ...state.chats, action.payload ] }
+        
         case 'CHAT_LOADING':
             return { ...state, loading : action.payload }
         default:

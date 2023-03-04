@@ -6,10 +6,15 @@ import Login from './pages/login'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { LoadUser } from './redux/action/AuthAction'
+import { getMyUser } from './redux/action/UserAction'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const dispatch = useDispatch()
-  const user = useSelector((state) => state.auth.auth)
+  const auth = useSelector((state) => state.auth.auth)
+  const { users , userLoading} = useSelector(state => state.users)
+  let user = users?.find(user => user?._id === auth?.id)
 
   useEffect(() => {
     dispatch(LoadUser())
@@ -17,20 +22,24 @@ const App = () => {
 
   return (
     <Box className="App">
-        <Routes>
+      <ToastContainer autoClose={2000}/>
+        {
+          userLoading ? "" :
+          <Routes>
           <Route
             path="/"
-            element={user ? <Home user={user} /> : <Navigate to="/login" />}
+            element={auth ? <Home user={user} auth={auth} /> : <Navigate to="/login" />}
           />
           <Route
             path="/login"
-            element={!user ? <Login /> : <Navigate to="/" />}
+            element={!auth ? <Login /> : <Navigate to="/" />}
           />
           <Route
             path="/register"
-            element={!user ? <Register /> : <Navigate to="/" />}
+            element={!auth ? <Register /> : <Navigate to="/" />}
           />
         </Routes>
+        }
     </Box>
   )
 }
