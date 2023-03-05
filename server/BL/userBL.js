@@ -1,6 +1,7 @@
 const userSchema = require('../models/userSchema')
 const firebase = require('../config/firebase-cloud-helper')
 const iconv = require('iconv-lite');
+const chatBL = require('../BL/chatBL')
 
 exports.getUser = (id) => {
   return new Promise((resolve , reject) => {
@@ -35,8 +36,10 @@ exports.getAllUser = () => {
 }
 
 exports.deleteUser = (id) => {
-  return new Promise((resolve , reject) => {
+  return new Promise(async (resolve , reject) => {
     try {
+      await chatBL.DeleteUserChats(id)
+      await this.deletePictureProfile(id)
       userSchema.findByIdAndRemove(id , (err) => {
           if(err) {
               reject(err)
@@ -53,7 +56,8 @@ exports.deleteUser = (id) => {
 exports.updatePictureProfile = (file , id) => {
  return new Promise(async(resolve, reject) => {
    try {
-     let uploadFile = await firebase.uploadProfilePicture(file , id)
+     if(file) {
+      let uploadFile = await firebase.uploadProfilePicture(file , id)
      data = { filename : iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8') , url : uploadFile }
      userSchema.findByIdAndUpdate(id ,
       { profilePicture : data } , async (err) => {
@@ -64,6 +68,10 @@ exports.updatePictureProfile = (file , id) => {
           resolve(getUser)
         }
       })
+     } else {
+      let getUser = await this.getUser(id)
+          resolve(getUser)
+     }
    } catch (error) {
      resolve(error)
    }

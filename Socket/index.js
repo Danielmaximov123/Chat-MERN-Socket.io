@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const io = require('socket.io')(8800 || process.env.PORT , {
     cors : {
-        origin : 'http://localhost:3000'
+        origin : ['http://localhost:3000' , 'http://localhost:3001']
     }
 })
 
@@ -17,7 +17,7 @@ io.on('connection' , (socket) => {
                 socketId : socket.id
             })
         }
-        activeUsers
+        
         io.emit('get-users' , activeUsers)
     })
 
@@ -25,10 +25,8 @@ io.on('connection' , (socket) => {
     socket.on('send-message' , data => {
         const {receiverId} = data
         const user = activeUsers.find(user => user.userId === receiverId)
-        console.log(receiverId);
-        console.log(activeUsers);
         if(user) {
-            io.to(user.socketId).emit('receive-message' , data.data)
+            io.to(user.socketId).emit('receive-message' , data)
         }
     })
 

@@ -1,23 +1,21 @@
 import axios from "axios"
-import { getMyUser } from "./UserAction"
+import { toast } from "react-toastify"
 
-export const logIn = (data) => async (dispatch) => {
+export const logIn = (data , newUser) => async (dispatch) => {
   dispatch({ type: 'AUTH_LOADING' , payload : true })
-  try {
       let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/login` , data)
       const { success , token , message } = resp.data
       if(success) {
           localStorage.setItem('token' , token)
-          await getMyUser(token , dispatch)
+          if(newUser !== 'newUser') {
+              toast.success('Login successfully!' , {position : toast.POSITION.TOP_CENTER})
+            }
           dispatch({ type: 'GET_LOGIN', payload: token })
           dispatch({ type: 'AUTH_LOADING' , payload : false })
         } else {
-            console.log(message);
+          toast.error(message , {position : toast.POSITION.TOP_CENTER})
           dispatch({ type: 'AUTH_LOADING' , payload : false })
       }
-  } catch (error) {
-    dispatch({ type: 'AUTH_LOADING' , payload : false })
-  }
 }
 
 export const LoadUser = () => {
@@ -35,12 +33,19 @@ export const LoadUser = () => {
     }
 }
 
-export const signUp = (formData) => async (dispatch) => {
-//   dispatch({ type: 'AUTH_START' })
-  try {
-
-  } catch (error) {
-    console.log(error)
-    // dispatch({ type: 'AUTH_FAIL' })
-  }
+export const signUp = (data) => async (dispatch) => {
+  dispatch({ type: 'AUTH_LOADING' , payload : true })
+    let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/register` , data,{
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+    const { success , newUser , message } = resp.data
+    if(success) {
+        dispatch({ type: 'ADD_USER', payload: newUser })
+        logIn({ email : newUser.email , password : newUser.password } , 'newUser')
+        dispatch({ type: 'AUTH_LOADING' , payload : false })
+        toast.success("Welcome to the chat!" , {position : toast.POSITION.TOP_CENTER})
+      } else {
+          toast.error(message , {position : toast.POSITION.TOP_CENTER})
+        dispatch({ type: 'AUTH_LOADING' , payload : false })
+    }
 }

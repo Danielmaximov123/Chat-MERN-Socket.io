@@ -4,10 +4,11 @@ import Logout from '@mui/icons-material/Logout';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
-const UserInMenu = ({ user , setEditUser , setChatSelect , socket}) => {
+const UserInMenu = ({ setEditUser , setChatSelect , socket , userId }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const dispatch = useDispatch()
-    const {loadingUpdate} = useSelector(state => state.users)
+    const {loadingUpdate , users} = useSelector(state => state.users)
+    const foundUser = users?.find(user => user?._id === userId);
 
   return (
     <>
@@ -20,11 +21,11 @@ const UserInMenu = ({ user , setEditUser , setChatSelect , socket}) => {
       >
         {
           loadingUpdate ? <CircularProgress sx={{ color : '#FFFFFF' }} style={{ width: "1.5rem", height: "1.5rem" , margin : '0.5rem'}}/> :
-        <Tooltip placement='left' title={user?.displayName}>
+        <Tooltip placement='left' title={foundUser?.displayName}>
         <Avatar
           src={
-            user?.profilePicture?.url
-            ? user?.profilePicture?.url
+            foundUser?.profilePicture?.url
+            ? foundUser?.profilePicture?.url
             : 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true'
           }
           />
@@ -70,13 +71,13 @@ const UserInMenu = ({ user , setEditUser , setChatSelect , socket}) => {
       >
         <MenuItem onClick={() => {setEditUser(true) ; setChatSelect(null)}}>
           <Avatar src={
-            user?.profilePicture?.url
-            ? user?.profilePicture?.url
+            foundUser?.profilePicture?.url
+            ? foundUser?.profilePicture?.url
             : 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true'
           }/> My account
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'}); socket.current.disconnect()}}>
+        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'}); socket.current.emit('user-logout', userId);}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

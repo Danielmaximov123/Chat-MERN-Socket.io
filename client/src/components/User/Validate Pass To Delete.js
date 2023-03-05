@@ -1,11 +1,12 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel } from '@mui/material'
 import React, { useState } from 'react'
-import CustomTextPassField from './../Custom Style/customTextPassField';
+import CustomTextPassField from '../Custom Style/customTextPassField';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
 
-const ValidatePass = ({validate , setValidate , handleSubmit , userData , bcrypt}) => {
+const ValidatePassToDelete = ({deleteUser , setDeleteUser , handleDelete , userData , bcrypt}) => {
     const [password, setPassword] = useState({ password : '' , confirmPassword : '' })
+    const [agree, setAgree] = useState(false)
 
     const check = (e) => {
         e.preventDefault()
@@ -13,32 +14,33 @@ const ValidatePass = ({validate , setValidate , handleSubmit , userData , bcrypt
            return toast.error('The passwords do not match' , {position : toast.POSITION.TOP_CENTER})
         }
         if(bcrypt.compareSync(password.password, userData.password)) {
-            handleSubmit()
+            handleDelete()
             setPassword({ password : '' , confirmPassword : '' })
         } else {
             return toast.error('Authentication failed, please try again.' , {position : toast.POSITION.TOP_CENTER})
         }
     }
 
+
   return (
     <Dialog
     fullWidth={true}
     maxWidth={'xs'}
-    open={validate}
-    onClose={() => setValidate(!validate)}
+    open={deleteUser}
+    onClose={() => setDeleteUser(!deleteUser)}
     aria-labelledby="responsive-dialog-title"
   >
         <DialogActions>
-      <Button sx={{position : 'absolute' , top : '1rem'}} size='large' color="error" autoFocus onClick={() => setValidate(!validate)}>
+      <Button sx={{position : 'absolute' , top : '1rem'}} size='large' color="error" autoFocus onClick={() => setDeleteUser(!deleteUser)}>
         X
       </Button>
     </DialogActions>
      <DialogTitle id="alert-dialog-title" sx={{textAlign : 'center'}}>
-        Verify your Account
+        Delete your Account
      </DialogTitle>
     <DialogContent sx={{textAlign : 'center'}}>
         <DialogContentText id="alert-dialog-description" >
-        In order to update the details, you will need to verify with your password
+        In order to the user, you will need to verify with your password
         </DialogContentText>
         <Box component='form' onSubmit={check} sx={{ margin : '1rem 0rem' }}>
             <CustomTextPassField
@@ -57,8 +59,9 @@ const ValidatePass = ({validate , setValidate , handleSubmit , userData , bcrypt
             variant="outlined"
             onChange={e => setPassword({...password , confirmPassword : e.target.value})}
             />
-        <LoadingButton sx={{ margin: '0.2rem' }} type='submit' fullWidth variant='contained' autoFocus>
-        Verify your account
+            <FormControlLabel checked={agree} onChange={e => setAgree(e.target.checked)} control={<Checkbox />} label="Agree to delete your user and chats?" />
+        <LoadingButton disabled={!agree} sx={{ margin: '0.2rem' }} type='submit' fullWidth variant='contained' autoFocus>
+        Delete your account
       </LoadingButton>
         </Box>
     </DialogContent>
@@ -66,4 +69,4 @@ const ValidatePass = ({validate , setValidate , handleSubmit , userData , bcrypt
   )
 }
 
-export default ValidatePass
+export default ValidatePassToDelete

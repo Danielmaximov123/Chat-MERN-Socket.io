@@ -31,7 +31,7 @@ const ChatBoxComp = ({
       }
     }
     chat !== null && getUserData()
-  }, [chat, currentUser])
+  }, [chat, currentUser , dispatch])
 
   // fetch messages
   useEffect(() => {

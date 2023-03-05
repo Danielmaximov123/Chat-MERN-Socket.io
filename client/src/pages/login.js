@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import { logIn } from '../redux/action/AuthAction'
 import { useDispatch, useSelector } from 'react-redux'
 
-const Login = () => {
+const Login = ({windowWidth}) => {
   const [visible, setVisible] = useState(false)
   const loading = useSelector((state) => state.auth.loading);
   const [user, setUser] = useState({ email: '', password: '' })
@@ -23,7 +23,7 @@ const Login = () => {
     <Box sx={style.mainBoxInAuthPage}>
       <Box
         sx={{
-          width: '33.33333%',
+          width: windowWidth < 739 ? '70%' : windowWidth > 740 && windowWidth < 1099? '60%' : windowWidth > 1100 ? '25%' : '',
           backgroundColor: 'white',
           padding: '2rem',
           borderRadius: '1rem',
@@ -57,9 +57,11 @@ const Login = () => {
           }}
           onChange={e => setUser({...user, password : e.target.value})}
         />
-        <Link to="/register" style={{ margin: '0.2rem' }}>
+        <Box style={{ margin: '0.5rem' }}>
+        <Link to="/register">
           You do not have a user ? Register
         </Link>
+        </Box>
         <LoadingButton loading={loading} type="submit" sx={{ margin: '0.2rem' }} fullWidth variant="contained">
           Login
         </LoadingButton>

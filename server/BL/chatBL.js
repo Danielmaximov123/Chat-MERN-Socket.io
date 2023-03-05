@@ -1,4 +1,5 @@
 const ChatModel = require('../models/chatSchema')
+const MessageModel = require('../models/messageSchema')
 
 exports.createChat = (data) => {
     return new Promise(async(resolve , reject) => {
@@ -29,6 +30,7 @@ exports.getAllChats = () => {
           }
     });
 }
+
 exports.userChats = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -41,6 +43,27 @@ exports.userChats = (userId) => {
           }
     });
 }
+
+exports.DeleteUserChats = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const chat = await ChatModel.find({
+              members: { $in: [userId] },
+            });
+            
+            await MessageModel.deleteMany({
+                chatId: { $in: chat.map((c) => c._id) },
+            });
+            await ChatModel.deleteMany({
+              _id: { $in: chat.map((c) => c._id) },
+            });
+            resolve('user deleted')
+          } catch (error) {
+            reject(error);
+          }
+    });
+}
+
 
 exports.findChat = (firstId , secondId) => {
     return new Promise(async (resolve , reject) => {

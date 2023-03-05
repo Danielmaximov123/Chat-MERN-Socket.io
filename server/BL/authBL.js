@@ -1,8 +1,10 @@
 const userSchema = require('../models/userSchema')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const userBL = require('../BL/userBL')
 
-exports.register = (data) => {
+
+exports.register = (data , file) => {
   return new Promise(async (resolve, reject) => {
     const { fName , lName , password, email } = data
     try {
@@ -32,7 +34,6 @@ exports.register = (data) => {
       const newUser = new userSchema({
         fName,
         lName,
-        displayName : `${fName} ${lName}`,
         email,
         password: passwordHash,
       })
@@ -41,7 +42,11 @@ exports.register = (data) => {
         if(err) {
             reject(err)
         } else {
-            resolve({success : true , newUser})
+          if(file) {
+            await userBL.updatePictureProfile(file , newUser._id)
+          }
+          let getUser = await this.getUser(id)
+            resolve({success : true , getUser})
         }
       });
     } catch (error) {

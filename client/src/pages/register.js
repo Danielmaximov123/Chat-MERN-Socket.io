@@ -1,69 +1,88 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, IconButton, InputAdornment, TextField } from '@mui/material'
-import { useState } from 'react'
+import { Box, Grid, TextField } from '@mui/material'
+import { useEffect, useState } from 'react'
 import style from '../styles'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { logIn, signUp } from '../redux/action/AuthAction'
+import { signUp } from '../redux/action/AuthAction'
+import CustomTextPassField from '../components/Custom Style/customTextPassField'
+import UploadPhotoRegister from '../components/User/Upload Photo Register'
 
-const Register = () => {
+const Register = ({windowWidth}) => {
   const dispatch = useDispatch()
-  const [visible, setVisible] = useState(false)
-  const [user, setUser] = useState({ email: '', username: '', password: '' })
+  const [user, setUser] = useState({ email: '', fName: '' , lName : '' , password: '' })
+  const [profilePic, setProfilePic] = useState(null)
+
+  console.log(profilePic);
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    let form = new FormData()
+    form.append('photo' , profilePic)
+    form.append('data' , JSON.stringify(user))
+    dispatch(signUp(form))
+  }
 
   return (
     <Box sx={style.mainBoxInAuthPage}>
       <Box
         sx={{
-          width: '33.33333%',
+          width: windowWidth < 967 ? '70%' : windowWidth > 968 && windowWidth < 1099? '60%' : windowWidth > 1100 ? '40%' : '',
           backgroundColor: 'white',
           padding: '2rem',
           borderRadius: '1rem',
         }}
         component="form"
-        onSubmit={signUp(user)}
+        onSubmit={handleSubmit}
       >
         <h1 style={{ textAlign: 'center' }}>Register</h1>
+        <Box sx={{ margin : '1rem' }}>
+        <UploadPhotoRegister profilePic={profilePic} setProfilePic={setProfilePic}/>
+        </Box>
+        <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={6} >
         <TextField
           sx={{ margin: '0.2rem' }}
           fullWidth
-          id="outlined-basic"
-          label="Username"
+          label="First Name"
           variant="outlined"
-          onChange={e => setUser({...user, username : e.target.value})}
-        />
+          onChange={e => setUser({...user, fName : e.target.value})}
+          />
+          </Grid>
+        <Grid item xs={12} sm={6} md={6} >
+        <TextField
+          sx={{ margin: '0.2rem' }}
+          fullWidth
+          label="Last Name"
+          variant="outlined"
+          onChange={e => setUser({...user, lName : e.target.value})}
+          />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} >
         <TextField
           type="email"
           sx={{ margin: '0.2rem' }}
           fullWidth
-          id="outlined-basic"
           label="Email"
           variant="outlined"
           onChange={e => setUser({...user, email : e.target.value})}
         />
-        <TextField
-          type={visible ? 'text' : 'password'}
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} >
+        <CustomTextPassField
+          onChange={e => setUser({...user, password : e.target.value})}
           sx={{ margin: '0.2rem' }}
           fullWidth
-          id="outlined-basic"
           label="Password"
           variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setVisible(!visible)}>
-                  {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-          onChange={e => setUser({...user, password : e.target.value})}
         />
-        <Link to="/login" style={{ margin: '0.2rem' }}>
+          </Grid>
+        </Grid>
+        <Box style={{ margin: '0.5rem' }}>
+        <Link to="/login">
           Already have user ? Click Here
         </Link>
+        </Box>
         <LoadingButton type='submit' sx={{ margin: '0.2rem' }} fullWidth variant="contained">
           Register
         </LoadingButton>

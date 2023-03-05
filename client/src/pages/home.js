@@ -10,6 +10,7 @@ import { getAllUsers } from '../redux/action/UserAction'
 import User from '../components/users/User'
 import UserInMenu from '../components/User/User In Menu'
 import EditUser from '../components/User/Edit User'
+import Push from 'push.js'
 
 const Home = ({ user , auth}) => {
   const dispatch = useDispatch()
@@ -22,14 +23,20 @@ const Home = ({ user , auth}) => {
   const socket = useRef()
   const [onlineUsers, setOnlineUsers] = useState([])
   const [editUser, setEditUser] = useState(false)
+  const [usersWithoutMe, setUsersWithoutMe] = useState([])
+
+  const updateUsersWithoutMe = () => {
+    setUsersWithoutMe(users?.filter((i) => i?._id !== user?._id))
+  }
 
   useEffect(() => {
     dispatch(getUserChats(user?._id))
-  }, [user])
+  }, [user , dispatch])
 
   useEffect(() => {
     dispatch(getAllUsers())
-  }, [dispatch])
+    updateUsersWithoutMe()
+  }, [dispatch , user])
   
   // Socket
   useEffect(() => {
@@ -45,16 +52,24 @@ const Home = ({ user , auth}) => {
   }, [auth])
 
   useEffect(() => {
-    socket.current.on('receive-message', (data) => {
-      dispatch({ type : 'ADD_MESSAGE' , payload : data })
+    socket.current.on('receive-message', data => {
+      dispatch({ type : 'ADD_MESSAGE' , payload : data.data })
+      Push.create(data.findUser.displayName, {
+        body: data.data.text,
+        icon: data.findUser.profilePicture.url,
+        timeout: 4000,
+        onClick: function () {
+          window.focus();
+          this.close();
+        }
+      });
     })
   }, [])
 
 useEffect(() => {
-  socket.current.on('user-updated', (updatedUserDetails) => {
-    // dispatch an action to update the user details in the state
-    console.log(updatedUserDetails); // its print but after its send to dispatch its not render the update details
-    dispatch({ type: 'UPDATE_USER', payload: updatedUserDetails });
+  socket.current.on('user-updated', async (updatedUserDetails) => {
+    await dispatch({ type: 'UPDATE_USER', payload: updatedUserDetails });
+    updateUsersWithoutMe()
   });
 }, []);
 
@@ -64,8 +79,6 @@ useEffect(() => {
     const online = onlineUsers.find((user) => user.userId === chatMember)
     return online ? true : false
   }
-
-  let usersWithoutMe = users?.filter((i) => i?._id !== user?._id)
 
   return (
       <Box sx={style.mainBoxInChatPage}>
@@ -83,9 +96,9 @@ useEffect(() => {
               }}
             >
               <Box sx={{width : '100%' , display: 'flow-root' , padding: '1rem 0' , borderBottom : '2px dashed #009e0736' }}>
-              <Box sx={{width: '50%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
+              <Box sx={{width: '45%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
               <Box sx={{ float: 'right' , display: 'inline-flex' , margin: '0 2rem'}}>
-                <UserInMenu socket={socket} setChatSelect={setChatSelect} user={user} editUser={editUser} setEditUser={setEditUser}/>
+                <UserInMenu socket={socket} setChatSelect={setChatSelect} userId={user?._id} setEditUser={setEditUser}/>
               </Box>
               </Box>
               <Box>

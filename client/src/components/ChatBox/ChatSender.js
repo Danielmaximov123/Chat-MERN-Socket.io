@@ -4,12 +4,14 @@ import InputEmoji from 'react-input-emoji'
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send'
 import { postMessages } from '../../redux/action/MessagesAction'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ChatSenderComp = ({currentUser , chat  , socket}) => {
   const dispatch = useDispatch()
   const [newMessage, setNewMessage] = useState('')
   const [file, setFile] = useState(null)
+  const {users} = useSelector((state) => state.users)  
+  let user = users.find(user => user._id === currentUser)
 
   const handleChange = (e) => {
     setNewMessage(e)

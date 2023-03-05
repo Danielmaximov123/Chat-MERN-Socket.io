@@ -28,8 +28,8 @@ exports.getMessages = (chatId) => {
     })
 }
 
-// exports.addMessage = () => {
-//     return new Promise(async(resolve ,reject) => {
-
-//     })
-// }
+exports.deleteMessages = (chats) => {
+    return new Promise(async (resolve , reject) => {
+        
+    })
+}

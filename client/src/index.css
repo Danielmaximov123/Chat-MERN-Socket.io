@@ -13,7 +13,7 @@
     background: var(--cardColor);
     border-radius: 1rem;
     display: grid;
-    grid-template-rows: 14vh 60vh 13vh;
+    grid-template-rows: 14vh 60vh 13vh;;
 }
 
   .Chat-container {
@@ -132,4 +132,30 @@
 
 #upIMG:hover {
   opacity: 1;
+}
+
+/* Default styles for .edit-user-box */
+.edit-user-box {
+  margin-left: 4rem;
+  margin-right: 4rem;
+}
+
+/* Media query for screens smaller than 768px */
+@media (max-width: 800px) {
+  .edit-user-box {
+    margin-left: 0rem;
+    margin-right: 0rem;
+  }
+
+  .edit-user-box button {
+    font-size: 0.750rem;
+  }
+}
+
+/* Media query for screens larger than 1200px */
+@media (min-width: 1200px) {
+  .edit-user-box {
+    margin-left: 4rem;
+    margin-right: 4rem;
+  }
 }

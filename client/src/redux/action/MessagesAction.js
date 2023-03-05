@@ -7,8 +7,10 @@ export const getMessages = (chatId) => async dispatch => {
     dispatch({ type : 'MESSAGE_LOADING' , payload : false })
 }
 
-export const postMessages = (data , socket , receiverId) => async dispatch => {
+export const postMessages = (data , socket , receiverId) => async (dispatch , getState) => {
     let resp = await axios.post(`${process.env.REACT_APP_URL_API}/messages` , data)
+    let findUser = getState().users.users.find(user=> user._id === data.senderId)
     dispatch({ type : 'ADD_MESSAGE' , payload : resp.data })
-    socket.current.emit('send-message', {receiverId , data : resp.data})
+    socket.current.emit('send-message', {receiverId , data : resp.data , findUser})
+    socket.current.emit('notification' , {receiverId , data : resp.data , findUser})
 }

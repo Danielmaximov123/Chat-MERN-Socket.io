@@ -4,9 +4,8 @@ import Home from './pages/home'
 import Register from './pages/register'
 import Login from './pages/login'
 import { useSelector, useDispatch } from 'react-redux'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { LoadUser } from './redux/action/AuthAction'
-import { getMyUser } from './redux/action/UserAction'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,11 +13,31 @@ const App = () => {
   const dispatch = useDispatch()
   const auth = useSelector((state) => state.auth.auth)
   const { users , userLoading} = useSelector(state => state.users)
-  let user = users?.find(user => user?._id === auth?.id)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     dispatch(LoadUser())
   }, [dispatch])
+
+  useEffect(() => {
+    const findUser = () => {
+      const foundUser = users?.find(user => user?._id === auth?.id);
+      setUser(foundUser);
+    };
+    findUser();
+  }, [users, auth , dispatch]);
+  
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowWidth(window.innerWidth);
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <Box className="App">
@@ -32,11 +51,11 @@ const App = () => {
           />
           <Route
             path="/login"
-            element={!auth ? <Login /> : <Navigate to="/" />}
+            element={!auth ? <Login windowWidth={windowWidth}/> : <Navigate to="/" />}
           />
           <Route
             path="/register"
-            element={!auth ? <Register /> : <Navigate to="/" />}
+            element={!auth ? <Register windowWidth={windowWidth}/> : <Navigate to="/" />}
           />
         </Routes>
         }
