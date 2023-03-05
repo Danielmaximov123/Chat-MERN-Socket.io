@@ -37,9 +37,9 @@ const EditUser = ({socket}) => {
     }
     
 
-    const handleSubmit = () => {
+    const handleSubmit = (set , bool) => {
       dispatch(updateUser(user._id , userData , socket))
-      setValidate(!validate)
+      set(!bool)
     }
 
     const handleDelete = () => {
@@ -128,7 +128,7 @@ const EditUser = ({socket}) => {
         </Box>
         <ValidatePass bcrypt={bcrypt} validate={validate} setValidate={setValidate} handleSubmit={handleSubmit} userData={userData}/>
         <ValidatePassToDelete bcrypt={bcrypt} deleteUser={deleteUser} setDeleteUser={setDeleteUser} handleDelete={handleDelete} userData={userData}/>
-        <ChangePassword bcrypt={bcrypt} changePass={changePass} setChangePass={setChangePass} userData={userData}/>
+        <ChangePassword bcrypt={bcrypt} changePass={changePass} setChangePass={setChangePass} setUserData={setUserData} user={user}/>
     </Box>
   )
 }

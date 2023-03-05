@@ -45,7 +45,7 @@ exports.register = (data , file) => {
           if(file) {
             await userBL.updatePictureProfile(file , newUser._id)
           }
-          let getUser = await this.getUser(id)
+          let getUser = await userBL.getUser(newUser._id)
             resolve({success : true , getUser})
         }
       });
@@ -89,4 +89,37 @@ exports.login = (data) => {
       resolve({message : error.message})
     }
   })
+}
+
+exports.changePassword = (id , obj) => {
+  return new Promise(async (resolve , reject) => {
+    const user = await userSchema.findById(id)
+    let password = obj.password
+    let oldPass = await bcrypt.compare(obj.oldPassword , user.password)
+    if(!oldPass) {
+      resolve({success : false , message : 'The old password is wrong.'} )
+    }
+    const isSamePassword = await bcrypt.compare(password , user.password)
+    if( isSamePassword ) {
+        resolve({success : false , message : 'The new password should be different from old'} )
+    }
+    if (password.length < 8 || password.length > 16) {
+      resolve({
+        success: false,
+        message:
+          'The length of the password should be between 8 and 16 characters',
+      })
+    }
+    else {
+      let passwordHash = await bcrypt.hash(password, 12)
+        user.password = passwordHash
+        user.save((err) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve({success : true , message : 'The password has been successfully changed!'})
+            }
+        })
+    }
+})
 }

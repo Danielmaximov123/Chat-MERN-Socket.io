@@ -1,10 +1,10 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Grid, TextField } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import style from '../styles'
 import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { signUp } from '../redux/action/AuthAction'
+import { logIn, signUp } from '../redux/action/AuthAction'
 import CustomTextPassField from '../components/Custom Style/customTextPassField'
 import UploadPhotoRegister from '../components/User/Upload Photo Register'
 
@@ -13,14 +13,15 @@ const Register = ({windowWidth}) => {
   const [user, setUser] = useState({ email: '', fName: '' , lName : '' , password: '' })
   const [profilePic, setProfilePic] = useState(null)
 
-  console.log(profilePic);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     let form = new FormData()
     form.append('photo' , profilePic)
     form.append('data' , JSON.stringify(user))
-    dispatch(signUp(form))
+    let registerData = await dispatch(signUp(form))
+    if(registerData.success) {
+      dispatch(logIn({ email : user.email , password : user.password } , 'newUser'))
+    }
   }
 
   return (

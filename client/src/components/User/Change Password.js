@@ -3,23 +3,28 @@ import React, { useState } from 'react'
 import CustomTextPassField from '../Custom Style/customTextPassField';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
+import { getChangePasswordUser } from '../../redux/action/AuthAction';
 
-const ChangePassword = ({changePass , setChangePass , handleSubmit , userData , bcrypt}) => {
+const ChangePassword = ({changePass , setChangePass  , user , bcrypt ,}) => {
   const [oldPassword, setOldPassword] = useState('')
-    const [password, setPassword] = useState({ password : '' , confirmPassword : '' })
+  const [password, setPassword] = useState({ password : '' , confirmPassword : '' })
 
-    const check = (e) => {
+    const check = async (e) => {
         e.preventDefault()
         if(password.password !== password.confirmPassword) {
            return toast.error('The passwords do not match' , {position : toast.POSITION.TOP_CENTER})
         }
-        if(bcrypt.compareSync(oldPassword, userData.password)) {
-            handleSubmit(userData)
-            setPassword({ password : '' , confirmPassword : '' })
+        let data = await getChangePasswordUser(user._id , {password : password.password , oldPassword})
+        if(data.success) {
+          setPassword({ password : '' , confirmPassword : '' })
+          setOldPassword('')
+          toast.success(data.message , {position : toast.POSITION.TOP_CENTER})
+          setChangePass(!changePass)
         } else {
-            return toast.error('Authentication failed, please try again.' , {position : toast.POSITION.TOP_CENTER})
+            return toast.error(data.message , {position : toast.POSITION.TOP_CENTER})
         }
     }
+
 
   return (
     <Dialog

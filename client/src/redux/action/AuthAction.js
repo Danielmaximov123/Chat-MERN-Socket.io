@@ -7,9 +7,9 @@ export const logIn = (data , newUser) => async (dispatch) => {
       const { success , token , message } = resp.data
       if(success) {
           localStorage.setItem('token' , token)
-          if(newUser !== 'newUser') {
-              toast.success('Login successfully!' , {position : toast.POSITION.TOP_CENTER})
-            }
+          if(!newUser) {
+            toast.success("Login successfully!" , {position : toast.POSITION.TOP_CENTER})
+          }
           dispatch({ type: 'GET_LOGIN', payload: token })
           dispatch({ type: 'AUTH_LOADING' , payload : false })
         } else {
@@ -41,11 +41,16 @@ export const signUp = (data) => async (dispatch) => {
     const { success , newUser , message } = resp.data
     if(success) {
         dispatch({ type: 'ADD_USER', payload: newUser })
-        logIn({ email : newUser.email , password : newUser.password } , 'newUser')
         dispatch({ type: 'AUTH_LOADING' , payload : false })
         toast.success("Welcome to the chat!" , {position : toast.POSITION.TOP_CENTER})
+        return {success , newUser}
       } else {
           toast.error(message , {position : toast.POSITION.TOP_CENTER})
         dispatch({ type: 'AUTH_LOADING' , payload : false })
     }
+}
+
+export const getChangePasswordUser = async (id , data) => {
+  let resp = await axios.put(`${process.env.REACT_APP_URL_API}/auth/change-password/${id}` , data)
+      return resp.data
 }

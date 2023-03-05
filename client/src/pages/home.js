@@ -15,7 +15,7 @@ import Push from 'push.js'
 const Home = ({ user , auth}) => {
   const dispatch = useDispatch()
   const chats = useSelector((state) => state.chats.chats)
-  const {users, loadingUpdate, userLoading} = useSelector((state) => state.users)  
+  const {users} = useSelector((state) => state.users)  
   const [currentChat, setCurrentChat] = useState(null)
   const [chatSelect, setChatSelect] = useState(null)
   const messages = useSelector((state) => state.messages.messages)
@@ -47,7 +47,7 @@ const Home = ({ user , auth}) => {
     })
     socket.current.on('receive-chat', (chat) => {
       dispatch({ type : 'ADD_CHAT' , chat })
-      dispatch(getUserChats(user._id))
+      dispatch(getUserChats(user?._id))
     })
   }, [auth])
 
@@ -72,6 +72,10 @@ useEffect(() => {
     updateUsersWithoutMe()
   });
 }, []);
+
+useEffect(() => {
+  // socket.current.on('')
+},[])
 
 
   const checkOnlineStatus = (chat) => {
