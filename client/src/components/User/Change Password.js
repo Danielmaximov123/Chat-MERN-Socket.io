@@ -9,8 +9,15 @@ const ChangePassword = ({changePass , setChangePass  , user , bcrypt ,}) => {
   const [oldPassword, setOldPassword] = useState('')
   const [password, setPassword] = useState({ password : '' , confirmPassword : '' })
 
+  const isEnglishWord = (str) => {
+    return /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(str);
+  }
+
     const check = async (e) => {
         e.preventDefault()
+        if(!isEnglishWord(password.password) || !isEnglishWord(password.confirmPassword)) {
+          return toast.error('The password must be in English letters, numbers and symbols.' , {position : toast.POSITION.TOP_CENTER})
+        }
         if(password.password !== password.confirmPassword) {
            return toast.error('The passwords do not match' , {position : toast.POSITION.TOP_CENTER})
         }
@@ -24,7 +31,6 @@ const ChangePassword = ({changePass , setChangePass  , user , bcrypt ,}) => {
             return toast.error(data.message , {position : toast.POSITION.TOP_CENTER})
         }
     }
-
 
   return (
     <Dialog
