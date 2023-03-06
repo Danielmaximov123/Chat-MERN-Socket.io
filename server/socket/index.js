@@ -2,6 +2,7 @@ module.exports = (io) => {
     let activeUsers = [];
   
     io.on('connection', (socket) => {
+      console.log(`User ${socket.id} connected.`);
   
       socket.on('new-user-add', (newUserId) => {
         if (!activeUsers.some((user) => user.userId === newUserId)) {
@@ -43,6 +44,7 @@ module.exports = (io) => {
       socket.on('disconnect', () => {
         activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
         io.emit('get-users', activeUsers);
+        console.log(`User ${socket.id} disconnected.`);
       });
     });
   };
