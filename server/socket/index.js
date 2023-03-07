@@ -20,11 +20,11 @@ module.exports = (io) => {
         const user = activeUsers.find((user) => user.userId === receiverId);
         if (user) {
           io.to(user.socketId).emit('receive-message', data);
-          io.to(user.socketId).emit('notification', {
-            senderId: data.senderId,
-            isRead: false,
-            date: data.createdAt,
-          });
+        //   io.to(user.socketId).emit('notification', {
+        //     senderId: data.senderId,
+        //     isRead: false,
+        //     date: data.createdAt,
+        //   });
         }
       });
   
@@ -44,7 +44,6 @@ module.exports = (io) => {
       socket.on('disconnect', () => {
         activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
         io.emit('get-users', activeUsers);
-        console.log(`User ${socket.id} disconnected.`);
       });
     });
   };
