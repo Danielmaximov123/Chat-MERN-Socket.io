@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useBeforeUnload } from 'react-router-dom'
 import Home from './pages/home'
 import Register from './pages/register'
 import Login from './pages/login'
@@ -24,6 +24,7 @@ const App = () => {
     const findUser = () => {
       const foundUser = users?.find(user => user?._id === auth?.id);
       setUser(foundUser);
+      localStorage.setItem('userId' , foundUser?._id)
     };
     findUser();
   }, [users, auth , dispatch]);
@@ -39,6 +40,11 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useBeforeUnload(() => {
+    localStorage.removeItem('currentChat')
+    localStorage.removeItem('chatSelect')
+  })
+
   return (
     <Box className="App">
       <ToastContainer autoClose={2000}/>
@@ -47,7 +53,7 @@ const App = () => {
           <Routes>
           <Route
             path="/"
-            element={auth ? <Home user={user} auth={auth} /> : <Navigate to="/login" />}
+            element={auth ? <Home user={user} /> : <Navigate to="/login" />}
           />
           <Route
             path="/login"

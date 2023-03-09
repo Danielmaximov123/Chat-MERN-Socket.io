@@ -4,11 +4,19 @@ import Logout from '@mui/icons-material/Logout';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
-const UserInMenu = ({ setEditUser , setChatSelect , socket , userId }) => {
+const UserInMenu = ({ setEditUser , setCurrentChat , setChatSelect , socket , userId }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const dispatch = useDispatch()
     const {loadingUpdate , users} = useSelector(state => state.users)
     const foundUser = users?.find(user => user?._id === userId);
+
+    const myAccount = () => {
+    localStorage.removeItem('currentChat')
+    localStorage.removeItem('chatSelect')
+    setEditUser(true); 
+    setChatSelect(null); 
+    setCurrentChat(null)
+    }
 
   return (
     <>
@@ -69,7 +77,7 @@ const UserInMenu = ({ setEditUser , setChatSelect , socket , userId }) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={() => {setEditUser(true) ; setChatSelect(null)}}>
+        <MenuItem onClick={myAccount}>
           <Avatar src={
             foundUser?.profilePicture?.url
             ? foundUser?.profilePicture?.url
@@ -77,7 +85,7 @@ const UserInMenu = ({ setEditUser , setChatSelect , socket , userId }) => {
           }/> My account
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'}); socket.current.emit('user-logout', userId);}}>
+        <MenuItem onClick={() => {dispatch({type : 'LOGOUT_AUTH'}); socket.emit('user-logout', userId);}}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

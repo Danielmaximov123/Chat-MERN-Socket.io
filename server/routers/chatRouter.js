@@ -17,8 +17,8 @@ router.route('/:userId').get(async (req , res) => {
     res.send(data)
 })
 
-router.route('/:userId').get(async (req , res) => {
-    let data = await chatBL.userChats(req.params.userId)
+router.route('/get-chat/:chatId').get(async (req , res) => {
+    let data = await chatBL.findChatById(req.params.chatId)
     res.send(data)
 })
 

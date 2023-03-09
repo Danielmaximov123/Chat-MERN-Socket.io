@@ -145,6 +145,7 @@
   .edit-user-box {
     margin-left: 0rem;
     margin-right: 0rem;
+    
   }
 
   .edit-user-box button {
@@ -158,4 +159,21 @@
     margin-left: 4rem;
     margin-right: 4rem;
   }
+}
+
+/* em-emoji-picker {
+  position: absolute;
+  bottom: 15rem;
+  right: 14rem;
+} */
+
+.preview-pic {
+  box-shadow: 0.3px 0.5px 2.7px hsl(0, 0%, 0%, 0.14), 
+              0.4px 0.8px 1px -3.2px hsl(0, 0%, 0%, 0.14), 
+              1px 2px 2.5px -4.5px hsl(0, 0%, 0%, 0.14);
+  border-radius: 10px;
+  width: fit-content;
+  padding: 0rem 1rem;
+  height: 435px;
+  min-height: 230px;
 }

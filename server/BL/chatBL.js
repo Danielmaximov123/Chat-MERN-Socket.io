@@ -77,3 +77,19 @@ exports.findChat = (firstId , secondId) => {
        }
    })
 }
+
+exports.findChatById = (chatId) => {
+    return new Promise(async (resolve , reject) => {
+        try {
+          ChatModel.findById(chatId , (err ,data) => {
+            if(err) {
+                reject(err)
+            } else {
+                resolve(data)
+              }
+            })
+        } catch (error) {
+           resolve(error)
+       }
+   })
+}

@@ -3,19 +3,8 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 require('dotenv').config()
 require('./config/db')
-const http = require("http");
-const { Server } = require("socket.io");
 
 const app = express()
-
-const server = http.createServer(app);
-const io = new Server(server , {
-    cors : {
-        origin : 'http://localhost:3000',
-        methods: ["GET", "POST"],
-    },
-    transports: ["websocket", "polling"],
-})
 
 app.use(cors())
 app.use(express.json({limit: "10mb", extended: true}))
@@ -27,18 +16,20 @@ const authRouter = require('./routers/authRouter')
 const chatRouter = require('./routers/chatRouter')
 const messageRouter = require('./routers/messageRouter')
 const userRouter = require('./routers/usersRouter')
+const notificationRouter = require('./routers/notificationRouter')
 
 // Routers
 app.use('/auth' , authRouter)
 app.use('/chat' , chatRouter)
 app.use('/messages' , messageRouter)
+app.use('/notification' , notificationRouter)
 app.use('/user' , userRouter)
 
 const PORT = 7000 || process.env.PORT
 
 // socket.io
-require('./socket/index')(io);
+// require('./socket/index')(io);
 
-server.listen(PORT , () => {
+app.listen(PORT , () => {
     console.log(`The server is running in http://localhost:${PORT}`);
 })

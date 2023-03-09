@@ -38,10 +38,11 @@ exports.deleteFilesFromUserFolder = async (userId) => {
   };
 
   exports.uploadFileInChat = async (chatId , file , messageId) => {
-    const storageRef = ref(storage , `messages/${chatId}/${messageId} ${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`);
+    let filename = `${messageId} ${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`
+    const storageRef = ref(storage , `messages/${filename}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
+    return { filename , url : downloadURL , mimetype : file.mimetype}
   };
 
   exports.deleteFilesFromMessagesFolder = async (chatId , messageId) => {

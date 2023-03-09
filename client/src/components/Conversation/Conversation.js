@@ -1,10 +1,13 @@
-import { Avatar, Box, CircularProgress, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import React, { useEffect, useState } from 'react'
+import { Avatar, Badge, Box, CircularProgress, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { useEffect, useState } from 'react'
+import { getMessagesForConversation } from '../../redux/action/MessagesAction';
 import { getUser } from './../../redux/action/UserAction';
 import { StyledBadge } from './../Custom Style/StyledAvatarDot';
 
-const ConversationComp = ({ data , currentUser , select , online , userLoading }) => {
+const ConversationComp = ({ data , currentUser , select , online , notifications , socket}) => {
   const [userData, setUserData] = useState(null)
+  const [ lastMessage , setLastMessage ] = useState(null)
+  let notificationFind = notifications.filter(sender => sender?.senderId?.includes(data.members.find(id => !id.includes(currentUser))))
 
   useEffect(() => {
     const userId = data.members.find(id => !id.includes(currentUser))
@@ -20,11 +23,11 @@ const ConversationComp = ({ data , currentUser , select , online , userLoading }
     getUserData()
   },[])
 
-  if(userLoading) {
-    return(
-      <CircularProgress sx={{ color : '#FFFFFF' }} style={{ width: "1.5rem", height: "1.5rem" , margin : '0.5rem'}}/>
-    )
-  }
+  useEffect(() => {
+      getMessagesForConversation(data._id).then(resp => {
+        setLastMessage(...resp.slice(-1))
+      })
+  },[notifications])
 
   return (
     <>
@@ -37,7 +40,12 @@ const ConversationComp = ({ data , currentUser , select , online , userLoading }
       >
         <Avatar sx={{ width: 56, height: 56 }} alt={userData?.profilePicture?.url} src={userData?.profilePicture?.url ? userData?.profilePicture?.url : "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true"} />
       </StyledBadge>
-      <ListItemText primary={<p style={{margin : 0}}>{userData?.displayName}</p>} secondary={online ? "Online" : "Offline"} sx={{ marginLeft: '8px' }} />
+      <ListItemText primary={<p style={{margin : 0}}>{userData?.displayName}</p>} secondary={lastMessage?.text.slice(0 , 20)} sx={{ marginLeft: '8px' }} />
+      <p></p>
+      {
+        !notificationFind.find(chat => chat.chatId === select) &&  notificationFind.length > 0 ?
+        <Badge badgeContent={notificationFind.length} color="primary" sx={{marginRight: '2rem'}}/> : null
+      }
       </ListItemButton>
     </ListItem>
     </>

@@ -5,14 +5,14 @@ import { authReducer } from './reducers/AuthReducer';
 import { chatReducer } from "./reducers/chatsReducer";
 import { usersReducer } from "./reducers/usersReducers";
 import { messagesReducer } from './reducers/messagesReducer';
-
-
+import { notificationsReducer } from './reducers/notificationsReducer';
 
 const reducers = combineReducers({
     auth : authReducer,
     chats : chatReducer,
     users : usersReducer,
-    messages : messagesReducer
+    messages : messagesReducer,
+    notifications : notificationsReducer
 })
 
 const store = createStore(reducers , composeWithDevTools(applyMiddleware(thunk)))

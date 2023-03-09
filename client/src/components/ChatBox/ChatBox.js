@@ -4,21 +4,21 @@ import { getUser } from '../../redux/action/UserAction'
 import { StyledBadge } from '../Custom Style/StyledAvatarDot'
 import { getMessages } from './../../redux/action/MessagesAction'
 import ChatSenderComp from './ChatSender'
-import { format } from 'timeago.js'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import moment from 'moment/moment'
+import PreviewFileInChat from './Preview File in Chat'
 
 const ChatBoxComp = ({
   chat,
   currentUser,
   online,
-  messages,
-  setMessages,
-  loading,
   socket
 }) => {
   const [userData, setUserData] = useState(null)
   const scroll = useRef()
   const dispatch = useDispatch()
+  const messages = useSelector((state) => state.messages.messages)
+  const loading = useSelector((state) => state.messages.loading)
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => !id.includes(currentUser))
@@ -104,23 +104,27 @@ const ChatBoxComp = ({
                     gap: '0.5rem',
                   }}
                 >
+                  {Object.values(message.file).every((value) => value !== null) && <PreviewFileInChat file={message.file}/>}
                   <span>{message?.text}</span>
                   <span style={{ fontSize: '0.7rem', alignSelf: 'end' }}>
-                    {format(message?.createdAt)}
+                    {/* {format(message?.createdAt)} */}
+                    {moment(message?.createdAt).startOf(message?.createdAt).fromNow()}
                   </span>
                 </Box>
               )
             })}
           </>
         )}
+          
       </Box>
       {/* Chat Sender */}
-          <ChatSenderComp
-            setMessages={setMessages}
+      <Box>
+      <ChatSenderComp
             chat={chat}
             currentUser={currentUser}
             socket={socket}
           />
+      </Box>
       </>
     }
     </>
