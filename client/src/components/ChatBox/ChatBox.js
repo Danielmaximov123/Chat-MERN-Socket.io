@@ -105,9 +105,10 @@ const ChatBoxComp = ({
                   }}
                 >
                   {Object.values(message.file).every((value) => value !== null) && <PreviewFileInChat file={message.file}/>}
-                  <span>{message?.text}</span>
+                  <Box style={{ maxHeight: '5rem', overflowY: 'auto' }}>
+                  <span style={{ wordWrap: 'break-word', overflowWrap: 'break-word' , whiteSpace: message?.text?.includes(' ') ? 'pre-wrap' : 'initial'}}>{message?.text}</span>
+                  </Box>
                   <span style={{ fontSize: '0.7rem', alignSelf: 'end' }}>
-                    {/* {format(message?.createdAt)} */}
                     {moment(message?.createdAt).startOf(message?.createdAt).fromNow()}
                   </span>
                 </Box>

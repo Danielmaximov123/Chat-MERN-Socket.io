@@ -40,7 +40,7 @@ const ConversationComp = ({ data , currentUser , select , online , notifications
       >
         <Avatar sx={{ width: 56, height: 56 }} alt={userData?.profilePicture?.url} src={userData?.profilePicture?.url ? userData?.profilePicture?.url : "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true"} />
       </StyledBadge>
-      <ListItemText primary={<p style={{margin : 0}}>{userData?.displayName}</p>} secondary={lastMessage?.text.slice(0 , 20)} sx={{ marginLeft: '8px' }} />
+      <ListItemText primary={<p style={{margin : 0}}>{userData?.displayName}</p>} secondary={lastMessage?.text.length > 20 ? `${lastMessage?.text?.slice(0 , 20)}...` : lastMessage?.text } sx={{ marginLeft: '8px' }} />
       <p></p>
       {
         !notificationFind.find(chat => chat.chatId === select) &&  notificationFind.length > 0 ?

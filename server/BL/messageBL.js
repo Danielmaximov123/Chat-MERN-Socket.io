@@ -20,7 +20,6 @@ exports.addMessage = (data , file) => {
                 if(err) {
                     reject(err)
                 } else {
-                    console.log(newMessage);
                     resolve(newMessage)
                 }
               })

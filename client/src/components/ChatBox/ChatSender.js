@@ -13,10 +13,10 @@ import PreviewFile from './Preview File';
 const ChatSenderComp = ({currentUser , chat  , socket}) => {
   const dispatch = useDispatch()
   const pickerRef = useRef(null);
+  const [rows, setRows] = useState(0)
   const [newMessage, setNewMessage] = useState('')
   const [file, setFile] = useState(null)
   const {users} = useSelector((state) => state.users)  
-  let user = users.find(user => user._id === currentUser)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleSubmit = async  (e) => {
@@ -44,6 +44,7 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
       socket.emit('send-message', {receiverId , data , findUser , dataNotification})
         setNewMessage('')
         setFile(null)
+        setRows(0)
     } catch (error) {
         console.error(error)
     }
@@ -96,6 +97,46 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
     };
   }, [pickerRef]);
 
+  // const handleKeyDown = async (event) => {
+  //   if (event.key === "Enter" && event.shiftKey) {
+  //     event.preventDefault(); // prevent default behavior of adding a new line
+  //     const messageLines = (newMessage + "\n").split("\n");
+  //     if (messageLines.length < 5) {
+  //       setNewMessage(newMessage + "\n"); // append a newline character to the current value
+  //       setRows(Math.min(messageLines.length + 1, 2.5));
+  //     }
+  //   }
+  // };
+
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // prevent default behavior of adding a new line
+      const messageLines = (newMessage + "\n").split("\n");
+      if (!event.shiftKey) {
+        // submit the form if the user presses Enter without holding down Shift
+        return handleSubmit(event);
+      }
+      if (messageLines.length < 5) {
+        setNewMessage(newMessage + "\n"); // append a newline character to the current value
+        setRows(Math.min(messageLines.length + 1, 2.5));
+      }
+    }
+  };
+
+  const handleInput = (event) => {
+    const {scrollHeight , clientHeight , value} = event.target;
+    const newRows = scrollHeight > clientHeight ? rows + 0.5 : rows;
+    if (newRows <= 2.5) {
+      setRows(newRows);
+    }
+    setNewMessage(value);
+
+    if(!value) {
+      setRows(0)
+    }
+  };
+  
+
   return(
     <Box sx={{ position: 'relative' }}>
   <Box id='preview' sx={{ position: 'absolute' , display : 'flex' , alignItems: 'end' , bottom: '100%', left: '50%', transform: 'translateX(-50%)' }}>
@@ -112,7 +153,11 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
     sx={{ margin : '1.5rem 1rem 0rem 0rem'  , '& .MuiInputBase-root' : { borderRadius : '1.3125rem' }}}
     value={newMessage}
     fullWidth
-    onChange={e => setNewMessage(e.target.value)}
+    multiline
+    rows={!newMessage ? 0 : rows}
+    // onChange={onType}
+    onInput={handleInput}
+    onKeyDown={handleKeyDown}
     InputProps={{
       endAdornment : (
         <>
@@ -123,13 +168,13 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
             <input hidden type="file" onChange={handleFile} accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.mp4" />
             <AttachFileIcon />
           </IconButton>
+  <IconButton sx={{ backgroundColor : '#07ae12ce' , transition : '0s' , '&:hover': { backgroundColor: '#04870dce' }}} type='submit'>
+    <TelegramIcon sx={{ color : '#FFFFFF' }}/>
+  </IconButton>
         </>
       )
     }}
   />
-  <IconButton size='medium' sx={{ margin : '2rem 0rem' , backgroundColor : '#07ae12ce' , transition : '0s' , '&:hover': { backgroundColor: '#04870dce' }}} type='submit'>
-    <TelegramIcon sx={{ color : '#FFFFFF' }}/>
-  </IconButton>
 </Box> 
 </Box> 
   )

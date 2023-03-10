@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@cyntler/react-doc-viewer": "^1.12.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.10.6",
@@ -24,6 +23,7 @@
     "react-doc-viewer-updated": "^1.10.8",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
+    "react-pdf": "^6.2.2",
     "react-photo-view": "^1.2.3",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",

@@ -161,6 +161,13 @@
   }
 }
 
+/* Styles for tablets go here */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  #preview {
+    left: 28%;
+  }
+}
+
 /* em-emoji-picker {
   position: absolute;
   bottom: 15rem;
@@ -173,7 +180,18 @@
               1px 2px 2.5px -4.5px hsl(0, 0%, 0%, 0.14);
   border-radius: 10px;
   width: fit-content;
-  padding: 0rem 1rem;
-  height: 435px;
-  min-height: 230px;
+  padding: 1rem 1rem;
+  height: 25.188rem;
+  min-height: 14.375rem;
+  background: #5f5f5fb6;
+  margin : 0rem 0.5rem
+}
+
+.react-pdf__Page__canvas {
+  zoom: 30%;
+  margin: auto;
+}
+
+.react-pdf__Page__textContent.textLayer , .react-pdf__Page__annotations.annotationLayer {
+  display: none;
 }

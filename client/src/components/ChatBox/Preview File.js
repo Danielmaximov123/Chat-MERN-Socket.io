@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, IconButton } from "@mui/material";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import { Document, Page, pdfjs } from "react-pdf";
+const pdfIcon = 'https://cdn-icons-png.flaticon.com/512/136/136522.png'
+const docIcon = 'https://cdn-icons-png.flaticon.com/512/136/136521.png'
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
 
 const PreviewFile = ({ file, setFile }) => {
   const [previewUrl, setPreviewUrl] = useState("");
@@ -8,21 +13,51 @@ const PreviewFile = ({ file, setFile }) => {
     file?.type.includes("application/msword") ||
     file?.type.includes(
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ) ||
-    file.type.includes("application/pdf");
+    )
+    const isPDF = file.type.includes("application/pdf");
   const isImage = file.type.includes("image");
+  const isVideo = file.type.includes('video')
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreviewUrl(e.target.result);
-    };
-    reader.readAsDataURL(file);
+    let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        setPreviewUrl(e.target.result);
+    } 
   }, [file]);
 
+  const bytesToMegaBytes = (bytes) => {
+    const megaBytes = bytes / (1024 * 1024);
+    if (megaBytes < 1) {
+      const kiloBytes = bytes / 1024;
+      return kiloBytes.toFixed(2) + ' KB';
+    } else {
+      return megaBytes.toFixed(2) + ' MB';
+    }
+  }
+
+  useEffect(() => {
+    setPageNumber(1);
+  }, [file]);
+
+  const onDocumentLoadSuccess = () => {
+    setNumPages(numPages);
+  };
+
+  const handlePrevPage = () => {
+    setPageNumber(prevPageNumber => prevPageNumber - 1);
+  };
+
+  const handleNextPage = () => {
+    setPageNumber(prevPageNumber => prevPageNumber + 1);
+  };
+
   return (
-    <Box>
+    <>
       <IconButton
+      sx={{position: 'absolute' , color : '#FFFFFF'}}
         onClick={() => {
           setFile(!file);
           setPreviewUrl("");
@@ -37,8 +72,25 @@ const PreviewFile = ({ file, setFile }) => {
           alt={file.filename}
         />
       )}
-      {/* {isDocument && <DocViewer documents={[{ uri: previewUrl }]} pluginRenderers={DocViewerRenderers} />} */}
-    </Box>
+      {
+        isVideo && <video src={previewUrl} controls style={{ width: "300px", position: "relative", top: "7rem" }}/>
+      }
+      {isDocument ? <Box sx={{width: "300px" , textAlign : 'center' , position: 'relative' , top : '5rem'}} >
+        <img style={{width: '20%', top: '5rem'}} src={isPDF ? pdfIcon : docIcon} alt='doc'/>
+        <p>{file.name}</p>
+        <span>{bytesToMegaBytes(file.size)}</span>
+      </Box> : null}
+      {isPDF ? <Box sx={{width: "300px" , textAlign : 'center' , position: 'relative' , top : '3rem'}} >
+      <Document
+            file={previewUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            >
+            <Page pageNumber={pageNumber} />
+          </Document>
+        <p>{file.name}</p>
+        <span>{bytesToMegaBytes(file.size)}</span>
+      </Box> : null}
+    </> 
   );
 };
 

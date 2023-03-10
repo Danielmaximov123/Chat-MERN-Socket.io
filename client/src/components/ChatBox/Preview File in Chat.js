@@ -13,6 +13,7 @@ const PreviewFileInChat = ({file}) => {
           </PhotoView>
         </PhotoProvider>
     }
+
     </>
   )
 }
