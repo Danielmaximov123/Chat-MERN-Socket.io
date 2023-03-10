@@ -3,8 +3,18 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 require('dotenv').config()
 require('./config/db')
+const { createServer } = require('http')
+const { Server } = require('socket.io')
 
 const app = express()
+const server = createServer(app)
+const io = new Server(server , {
+    cors : {
+        origin : '*',
+        methods: ["GET", "POST"],
+    },
+    transports: ["websocket", "polling"],
+})
 
 app.use(cors())
 app.use(express.json({limit: "10mb", extended: true}))
@@ -27,9 +37,8 @@ app.use('/user' , userRouter)
 
 const PORT = 7000 || process.env.PORT
 
-// socket.io
-// require('./socket/index')(io);
+require('./socket')(io);
 
-app.listen(PORT , () => {
+server.listen(PORT , () => {
     console.log(`The server is running in http://localhost:${PORT}`);
 })
