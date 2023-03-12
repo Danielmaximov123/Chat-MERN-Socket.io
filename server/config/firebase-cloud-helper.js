@@ -42,7 +42,7 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `messages/${filename}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    return { filename , url : downloadURL , mimetype : file.mimetype}
+    return { filename , url : downloadURL , type : file.mimetype}
   };
 
   exports.deleteFilesFromMessagesFolder = async (chatId , messageId) => {
