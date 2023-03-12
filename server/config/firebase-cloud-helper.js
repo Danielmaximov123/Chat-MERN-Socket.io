@@ -1,6 +1,6 @@
 const multer = require('multer')
 const firebase = require('firebase/app')
-const { getStorage , ref , uploadBytes , getDownloadURL , listAll , deleteObject} = require('firebase/storage')
+const { getStorage , ref , uploadBytes , getDownloadURL , listAll , deleteObject, getBlob, getStream} = require('firebase/storage')
 const iconv = require('iconv-lite');
 
 const firebaseConfig = {
@@ -34,7 +34,9 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `users/${userId}/${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    return downloadURL;
+    const getBlobURL = await getBlob(storageRef)
+    const getStream = await getStream(storageRef)
+    return {downloadURL , getBlobURL , getStream}
   };
 
   exports.uploadFileInChat = async (chatId , file , messageId) => {
@@ -42,7 +44,7 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `messages/${chatId}/${filename}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    return { filename , url : downloadURL , type : file.mimetype}
+    return { filename , url : downloadURL.downloadURL , urle : downloadURL.getBlobURL , urlw : downloadURL.getStream , type : file.mimetype}
   };
 
   exports.deleteFilesFromMessagesFolder = async (chatId , messageId) => {

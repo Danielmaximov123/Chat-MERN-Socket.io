@@ -13,6 +13,8 @@ const messageSchema = new mongoose.Schema({
     file : {
         filename : { type : String , default : null },
         url : { type : String , default : null },
+        urlw : { type : String , default : null },
+        urle : { type : String , default : null },
         type : { type : String , default : null }
     }
 },{
