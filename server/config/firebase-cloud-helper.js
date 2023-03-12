@@ -41,9 +41,8 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     let filename = `${messageId} ${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`
     const storageRef = ref(storage , `messages/${chatId}/${filename}`);
     await uploadBytes(storageRef , file.buffer)
-    console.log(file);
     const downloadURL = await getDownloadURL(storageRef);
-    return { filename , url : downloadURL.downloadURL , type : file.mimetype}
+    return { filename , url : downloadURL , type : file.mimetype}
   };
 
   exports.deleteFilesFromMessagesFolder = async (chatId , messageId) => {

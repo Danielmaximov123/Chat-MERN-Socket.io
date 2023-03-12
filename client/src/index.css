@@ -195,3 +195,11 @@
 .react-pdf__Page__textContent.textLayer , .react-pdf__Page__annotations.annotationLayer {
   display: none;
 }
+
+.PDF-viewer-can canvas.react-pdf__Page__canvas {
+  width: 63rem !important;
+  height: 24rem !important;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 2rem 2rem 0rem 0rem;
+}
