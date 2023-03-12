@@ -34,8 +34,8 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `users/${userId}/${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    const getBlobURL = await getBlob(storageRef)
-    const getStream = await getStream(storageRef)
+    const getBlobURL = await getBlob()
+    const getStream = await getStream()
     return {downloadURL , getBlobURL , getStream}
   };
 
