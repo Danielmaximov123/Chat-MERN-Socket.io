@@ -1,7 +1,7 @@
 import { Box, Grid } from '@mui/material'
 import style from '../styles'
 import { useDispatch, useSelector } from 'react-redux'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getChatById, getUserChats } from '../redux/action/ChatAction'
 import ConversationComp from '../components/Conversation/Conversation'
 import ChatBoxComp from '../components/ChatBox/ChatBox'
@@ -13,7 +13,7 @@ import EditUser from '../components/User/Edit User'
 import { push } from '../push'
 import { removeNotification } from '../redux/action/NotificationsAction'
 
-const socket = io.connect(process.env.REACT_APP_URL_SOCKET);
+const socket = io.connect(process.env.REACT_APP_URL_API);
 
 const Home = ({ user}) => {
   const dispatch = useDispatch()
@@ -29,16 +29,16 @@ const Home = ({ user}) => {
   const [editUser, setEditUser] = useState(false)
   const [usersWithoutMe, setUsersWithoutMe] = useState([])
 
-  const updateUsersWithoutMe = useCallback(() => {
+  const updateUsersWithoutMe = useMemo(() => () => {
     setUsersWithoutMe(users?.filter((i) => i?._id !== user?._id));
-  }, [users, user]);
+  }, [users, user]);  
 
-  const findChatAndUse = async (chatId) => {
+  const findChatAndUse = useMemo(() => async (chatId) => {
     let resp = await getChatById(chatId)
     setCurrentChat(resp)
     setChatSelect(resp._id)
     dispatch(removeNotification({chatId: chatId}))
-  };
+  }, [dispatch]);  
 
   // Fetch users and chats only once when the component mounts
   useEffect(() => {
@@ -125,11 +125,12 @@ const Home = ({ user}) => {
     []
   );
   
-  const checkOnlineStatus = useCallback((chat) => {
+  const checkOnlineStatus = useMemo(() => (chat) => {
     const chatMember = chat.members.find((member) => member !== user?._id);
     const online = onlineUsers.find((user) => user.userId === chatMember);
     return online ? true : false
-}, [onlineUsers, user]);
+  }, [onlineUsers, user]);
+  
 
     const clickConversation = (matchingChat) => {
       setCurrentChat(matchingChat)
@@ -220,6 +221,7 @@ const Home = ({ user}) => {
                       chat={currentChat}
                       currentUser={user?._id}
                       socket={socket}
+                      editUser={editUser}
                     />
                    : 
                     <span className="chatbox-empty-message">

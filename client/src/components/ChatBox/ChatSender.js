@@ -21,12 +21,13 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
 
   const handleSubmit = async  (e) => {
     e.preventDefault()
+    console.log();
     if(!newMessage && file === null) {
       return null
     }
     const message = {
         senderId : currentUser,
-        text : newMessage,
+        text : newMessage.split("\n").filter(line => line.trim() !== "").join("\n"),
         chatId : chat._id,
     }
     // formData for server side
@@ -38,7 +39,6 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
     try {
       const receiverId = chat.members.find(id => id !== currentUser)
       let data = await dispatch(postMessages(form))
-      console.log(data);
       let dataNotification = await dispatch(postNotifications({senderId : data.senderId , chatId : chat._id , date : data.createdAt}))
       let findUser = users.find(user=> user._id === data.senderId)
       socket.emit('send-message', {receiverId , data , findUser , dataNotification})
@@ -97,17 +97,6 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
     };
   }, [pickerRef]);
 
-  // const handleKeyDown = async (event) => {
-  //   if (event.key === "Enter" && event.shiftKey) {
-  //     event.preventDefault(); // prevent default behavior of adding a new line
-  //     const messageLines = (newMessage + "\n").split("\n");
-  //     if (messageLines.length < 5) {
-  //       setNewMessage(newMessage + "\n"); // append a newline character to the current value
-  //       setRows(Math.min(messageLines.length + 1, 2.5));
-  //     }
-  //   }
-  // };
-
   const handleKeyDown = async (event) => {
     if (event.key === "Enter") {
       event.preventDefault(); // prevent default behavior of adding a new line
@@ -116,26 +105,27 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
         // submit the form if the user presses Enter without holding down Shift
         return handleSubmit(event);
       }
-      if (messageLines.length < 5) {
         setNewMessage(newMessage + "\n"); // append a newline character to the current value
-        setRows(Math.min(messageLines.length + 1, 2.5));
-      }
-    }
-  };
-
-  const handleInput = (event) => {
-    const {scrollHeight , clientHeight , value} = event.target;
-    const newRows = scrollHeight > clientHeight ? rows + 0.5 : rows;
-    if (newRows <= 2.5) {
-      setRows(newRows);
-    }
-    setNewMessage(value);
-
-    if(!value) {
-      setRows(0)
+        setRows(Math.min(messageLines.length + 1, 4)); // Update rows based on new message length
     }
   };
   
+  const handleInput = (event) => {
+    if (event.target.tagName.toLowerCase() === "input" && event.target.type === "file") {
+      return;
+    }
+    const { value } = event.target;
+    const lines = value.split('\n').length
+    const newRows =lines <= 4 ? lines : 4;
+    if (newRows <= 4) {
+      setRows(newRows); // Update rows based on new input length
+    }
+    setNewMessage(value);
+  };
+  
+
+  useEffect(() => {
+  }, [newMessage]);
 
   return(
     <Box sx={{ position: 'relative' }}>
@@ -150,12 +140,11 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
   <TextField
     id='my-text-field'
     placeholder='Type a message...'
-    sx={{ margin : '1.5rem 1rem 0rem 0rem'  , '& .MuiInputBase-root' : { borderRadius : '1.3125rem' }}}
+    sx={{ margin : '1.5rem 1rem 0.8rem 0rem'  , '& .MuiInputBase-root' : { borderRadius : '1.3125rem' }}}
     value={newMessage}
     fullWidth
     multiline
-    rows={!newMessage ? 0 : rows}
-    // onChange={onType}
+    rows={Math.min(rows, 4)}
     onInput={handleInput}
     onKeyDown={handleKeyDown}
     InputProps={{

@@ -46,14 +46,6 @@ const PreviewFile = ({ file, setFile }) => {
     setNumPages(numPages);
   };
 
-  const handlePrevPage = () => {
-    setPageNumber(prevPageNumber => prevPageNumber - 1);
-  };
-
-  const handleNextPage = () => {
-    setPageNumber(prevPageNumber => prevPageNumber + 1);
-  };
-
   return (
     <>
       <IconButton
@@ -87,7 +79,7 @@ const PreviewFile = ({ file, setFile }) => {
             >
             <Page pageNumber={pageNumber} />
           </Document>
-        <p>{file.name}</p>
+        {/* <p>{file.name}</p> */}
         <span>{bytesToMegaBytes(file.size)}</span>
       </Box> : null}
     </> 

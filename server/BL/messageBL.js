@@ -11,10 +11,10 @@ exports.addMessage = (data , file) => {
             })
 
             if (file) {
-                const { filename, url , mimetype } = await firebase.uploadFileInChat(data.chatId, file, newMessage._id);
+                const { filename, url , type } = await firebase.uploadFileInChat(data.chatId, file, newMessage._id);
                 newMessage.file.filename = filename; 
                 newMessage.file.url = url;
-                newMessage.file.mimetype = mimetype
+                newMessage.file.type = type
               }
             newMessage.save((err) => {
                 if(err) {

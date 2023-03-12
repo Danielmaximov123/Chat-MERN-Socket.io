@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema({
     file : {
         filename : { type : String , default : null },
         url : { type : String , default : null },
-        mimetype : { type : String , default : null }
+        type : { type : String , default : null }
     }
 },{
     timestamps : true

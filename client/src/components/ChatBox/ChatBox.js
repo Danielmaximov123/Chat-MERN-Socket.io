@@ -1,5 +1,5 @@
 import { Avatar, Box, CircularProgress, Divider, Grid, ListItemText } from '@mui/material'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getUser } from '../../redux/action/UserAction'
 import { StyledBadge } from '../Custom Style/StyledAvatarDot'
 import { getMessages } from './../../redux/action/MessagesAction'
@@ -8,17 +8,32 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment/moment'
 import PreviewFileInChat from './Preview File in Chat'
 
-const ChatBoxComp = ({
-  chat,
-  currentUser,
-  online,
-  socket
-}) => {
+const ChatBoxComp = ({chat,currentUser,online,socket , editUser}) => {
   const [userData, setUserData] = useState(null)
   const scroll = useRef()
+  const scrollLoadMore = useRef()
   const dispatch = useDispatch()
   const messages = useSelector((state) => state.messages.messages)
   const loading = useSelector((state) => state.messages.loading)
+  const [limit, setLimit] = useState(10)
+
+  const loadMoreMessages = useCallback(() => {
+    if (scrollLoadMore.current && scrollLoadMore.current.scrollTop <= 0 && limit < messages.length) {
+      setLimit(prevLimit => prevLimit + 4)
+    }
+  }, [messages.length, limit])
+  
+  useEffect(() => {
+    if (scrollLoadMore.current) {
+      scrollLoadMore.current.addEventListener('scroll', loadMoreMessages)
+      return () => {
+        if (scrollLoadMore.current) {
+          scrollLoadMore.current.removeEventListener('scroll', loadMoreMessages)
+        }
+      }
+    }
+  }, [loadMoreMessages])
+  
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => !id.includes(currentUser))
@@ -38,10 +53,13 @@ const ChatBoxComp = ({
     chat !== null && dispatch(getMessages(chat?._id))
   },[dispatch , chat])
 
+  const lastMessages = useMemo(() => messages.slice(-limit), [messages, limit])
 
   useEffect(() => {
     if (scroll.current) {
-      scroll.current?.scrollIntoView({ behavior : 'smooth' })
+      setTimeout(() => {
+        scroll.current.scrollIntoView({ behavior: 'smooth'})
+      }, 250)
     }
   }, [messages])
 
@@ -77,10 +95,11 @@ const ChatBoxComp = ({
         <Divider sx={{ marginLeft: '0' }} variant="inset" />
       </Box>
       {/* Chat Box Messages */}
-      <Box className="chat-body">
-        {messages.length > 0 && (
+      <Box className="chat-body" ref={scrollLoadMore}>
+        {scrollLoadMore?.current?.scrollTop === 5 && <Box sx={{ margin : 'auto' }}><CircularProgress sx={{height : '4rem' , width : '4rem'}} color="success" /></Box>}
+        {lastMessages.length > 0 && (
           <>
-            {messages?.map((message, index) => {
+            {lastMessages?.map((message, index) => {
               return (
                 <Box
                   key={index}
@@ -105,8 +124,8 @@ const ChatBoxComp = ({
                   }}
                 >
                   {Object.values(message.file).every((value) => value !== null) && <PreviewFileInChat file={message.file}/>}
-                  <Box style={{ maxHeight: '5rem', overflowY: 'auto' }}>
-                  <span style={{ wordWrap: 'break-word', overflowWrap: 'break-word' , whiteSpace: message?.text?.includes(' ') ? 'pre-wrap' : 'initial'}}>{message?.text}</span>
+                  <Box style={{ maxHeight: '8rem', overflowY: 'auto' }}>
+                  <span style={{ wordWrap: 'break-word', overflowWrap: 'break-word' , whiteSpace: message?.text?.includes('\n') ? 'pre-wrap' : 'initial'}}>{message?.text}</span>
                   </Box>
                   <span style={{ fontSize: '0.7rem', alignSelf: 'end' }}>
                     {moment(message?.createdAt).startOf(message?.createdAt).fromNow()}
