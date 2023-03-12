@@ -34,9 +34,7 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `users/${userId}/${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
-    const getBlobURL = await getBlob()
-    const getStream = await getStream()
-    return {downloadURL , getBlobURL , getStream}
+    return downloadURL
   };
 
   exports.uploadFileInChat = async (chatId , file , messageId) => {
@@ -44,6 +42,8 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     const storageRef = ref(storage , `messages/${chatId}/${filename}`);
     await uploadBytes(storageRef , file.buffer)
     const downloadURL = await getDownloadURL(storageRef);
+    const getBlobURL = await getBlob()
+    const getStream = await getStream()
     return { filename , url : downloadURL.downloadURL , urle : downloadURL.getBlobURL , urlw : downloadURL.getStream , type : file.mimetype}
   };
 
