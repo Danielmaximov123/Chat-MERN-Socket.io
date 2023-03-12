@@ -1,4 +1,4 @@
-export const bytesToMegaBytes = (bytes) => {
+exports.bytesToMegaBytes = (bytes) => {
     const megaBytes = bytes / (1024 * 1024);
     if (megaBytes < 1) {
       const kiloBytes = bytes / 1024;

@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment/moment'
 import PreviewFileInChat from './Preview File in Chat'
 
-const ChatBoxComp = ({chat,currentUser,online,socket , editUser}) => {
+const ChatBoxComp = ({chat,currentUser,online,socket}) => {
   const [userData, setUserData] = useState(null)
   const scroll = useRef()
   const scrollLoadMore = useRef()
@@ -104,6 +104,7 @@ const ChatBoxComp = ({chat,currentUser,online,socket , editUser}) => {
                 <Box
                   key={index}
                   ref={scroll}
+                  className={message.file.url !== null && 'file-in-message'}
                   sx={{
                     padding: '1rem',
                     alignSelf:
@@ -121,9 +122,10 @@ const ChatBoxComp = ({chat,currentUser,online,socket , editUser}) => {
                         : '#696969ab',
                     borderRadius: '1rem 1rem 0rem 1rem',
                     gap: '0.5rem',
+                    
                   }}
                 >
-                  {Object.values(message.file).every((value) => value !== null) && <PreviewFileInChat file={message.file}/>}
+                  {Object.values(message.file).every((value) => value !== null) && <PreviewFileInChat myUser={message?.senderId === currentUser} file={message.file}/>}
                   <Box style={{ maxHeight: '8rem', overflowY: 'auto' }}>
                   <span style={{ wordWrap: 'break-word', overflowWrap: 'break-word' , whiteSpace: message?.text?.includes('\n') ? 'pre-wrap' : 'initial'}}>{message?.text}</span>
                   </Box>
