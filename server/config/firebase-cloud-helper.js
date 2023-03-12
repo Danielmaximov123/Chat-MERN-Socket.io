@@ -1,6 +1,6 @@
 const multer = require('multer')
 const firebase = require('firebase/app')
-const { getStorage , ref , uploadBytes , getDownloadURL , listAll , deleteObject, getBlob, getStream} = require('firebase/storage')
+const { getStorage , ref , uploadBytes , getDownloadURL , listAll , deleteObject, getMetadata} = require('firebase/storage')
 const iconv = require('iconv-lite');
 
 const firebaseConfig = {
@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 
 firebase.initializeApp(firebaseConfig);
-const storage = getStorage();
+const storage = getStorage()
 
 exports.upload = multer({ storage: multer.memoryStorage() })
 
@@ -41,10 +41,9 @@ exports.deleteFilesFromUserFolder = async (userId) => {
     let filename = `${messageId} ${iconv.decode(Buffer.from(file.originalname, 'binary'), 'utf-8')}`
     const storageRef = ref(storage , `messages/${chatId}/${filename}`);
     await uploadBytes(storageRef , file.buffer)
+    console.log(file);
     const downloadURL = await getDownloadURL(storageRef);
-    const getBlobURL = await getBlob()
-    const getStream = await getStream()
-    return { filename , url : downloadURL.downloadURL , urle : downloadURL.getBlobURL , urlw : downloadURL.getStream , type : file.mimetype}
+    return { filename , url : downloadURL.downloadURL , type : file.mimetype}
   };
 
   exports.deleteFilesFromMessagesFolder = async (chatId , messageId) => {
