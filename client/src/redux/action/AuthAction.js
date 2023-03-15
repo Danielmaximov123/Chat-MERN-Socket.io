@@ -1,7 +1,7 @@
 import axios from "axios"
 import { toast } from "react-toastify"
 
-  export const logIn = (data , newUser , checkOnlineUser) => async (dispatch , getState) => {
+  export const logIn = (data , newUser , checkOnlineUser) => async (dispatch) => {
   dispatch({ type: 'AUTH_LOADING' , payload : true })
   let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/login` , data)
       if(checkOnlineUser.isLogin) {
