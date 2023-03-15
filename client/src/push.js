@@ -1,5 +1,5 @@
 export const push = (data) => {
-    Notification.requestPermission().then(perm => {
+  Notification.requestPermission().then(perm => {
       if (perm === 'granted') {
         const notification = new Notification(data.title , {
           body: data.body,
@@ -9,6 +9,6 @@ export const push = (data) => {
 
         // Add onclick event listener to the notification
             notification.addEventListener('click', data.onClick);
-      }
-    });
+          }
+        });
   };

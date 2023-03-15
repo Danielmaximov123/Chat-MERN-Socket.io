@@ -20,8 +20,8 @@ const Login = ({windowWidth , socket , onlineUsers}) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     let userId = users.find(check => check.email === user.email)?._id
-    let checkOnlineUser = onlineUsers.some(user => user.userId === userId) ? { isLogin : true } : { isLogin : false }
-    dispatch(logIn(user , null , checkOnlineUser))
+    let checkOnlineUser = onlineUsers?.some(user => user.userId === userId) ? { isLogin : true } : { isLogin : false }
+    dispatch(logIn(user , checkOnlineUser))
   }
 
   return (

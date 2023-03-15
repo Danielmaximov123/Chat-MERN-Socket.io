@@ -12,7 +12,7 @@ import { push } from '../push'
 import { removeNotification } from '../redux/action/NotificationsAction'
 
 
-const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
+const Home = ({ socket , onlineUsers}) => {
   const dispatch = useDispatch()
   const { chats, users , auth , notifications } = useSelector((state) => ({
     chats: state.chats.chats,
@@ -26,8 +26,8 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
   const [usersWithoutMe, setUsersWithoutMe] = useState([])
 
   const updateUsersWithoutMe = useMemo(() => () => {
-    setUsersWithoutMe(users?.filter((i) => i?._id !== user?._id));
-  }, [users, user]);  
+    setUsersWithoutMe(users?.filter((i) => i?._id !== auth?._id));
+  }, [users, auth]);  
 
   const findChatAndUse = useMemo(() => async (chatId) => {
     let resp = await getChatById(chatId)
@@ -38,12 +38,12 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
 
   // Fetch users and chats only once when the component mounts
   useEffect(() => {
-    dispatch(getUserChats(user?._id))
-  }, [dispatch, user])
+    dispatch(getUserChats(auth?._id))
+  }, [dispatch, auth])
   
   useEffect(() => {
     updateUsersWithoutMe();
-  }, [user, users]);
+  }, [auth, users]);
 
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
 
   // Socket
   useEffect(() => {
-    socket.emit('new-user-add', auth?.id)
+    socket.emit('new-user-add', auth?._id)
     socket.on('receive-chat', handleReceiveChat)
     socket.on('receive-message', receiveMessage)
     socket.on('user-updated', handleUserUpdated);
@@ -76,16 +76,20 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
     const handleReceiveChat = useCallback(
       (chat) => {
         dispatch({ type: 'ADD_CHAT', payload : chat });
-        dispatch(getUserChats(user._id));
+        dispatch(getUserChats(auth._id));
       },
-      [dispatch, user]
+      [dispatch, auth]
     );
 
     // Receive a new message from the server
-    const receiveMessage = useCallback((data) => {
+    const receiveMessage = useCallback(async (data) => {
       dispatch({ type : 'ADD_MESSAGE' , payload : data.data })
       if(!localStorage.getItem('currentChat')) {
          // Show a desktop notification if the chat is not open.
+         if('Notification' in window) {
+           const audio = new Audio('https://firebasestorage.googleapis.com/v0/b/chat-42e9b.appspot.com/o/notification.mp3?alt=media&token=5fc83762-f9ff-4d0e-9284-22f2b34b35bb')
+           audio.play();
+         }
         push({
           title : data.findUser.displayName,
           body: data.data.text,
@@ -114,10 +118,10 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
   );
   
   const checkOnlineStatus = useMemo(() => (chat) => {
-    const chatMember = chat.members.find((member) => member !== user?._id);
+    const chatMember = chat.members.find((member) => member !== auth?._id);
     const online = onlineUsers.find((user) => user.userId === chatMember);
     return online ? true : false
-  }, [onlineUsers, user]);
+  }, [onlineUsers, auth]);
   
 
     const clickConversation = (matchingChat) => {
@@ -147,7 +151,7 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
               <Box sx={{width : '100%' , display: 'flow-root' , padding: '1rem 0' , borderBottom : '2px dashed #009e0736' }}>
               <Box sx={{width: '45%', float: 'left'}}><h2 style={{ margin: 'auto 2rem' , color : '#15c41e'}}>Chat</h2></Box>
               <Box sx={{ float: 'right' , display: 'inline-flex' , margin: '0 2rem'}}>
-                <UserInMenu socket={socket} setCurrentChat={setCurrentChat} setChatSelect={setChatSelect} userId={user?._id} setEditUser={setEditUser}/>
+                <UserInMenu socket={socket} setCurrentChat={setCurrentChat} setChatSelect={setChatSelect} userId={auth?._id} setEditUser={setEditUser}/>
               </Box>
               </Box>
               <Box>
@@ -167,7 +171,7 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
                           <ConversationComp
                             select={chatSelect}
                             data={matchingChat}
-                            currentUser={user?._id}
+                            currentUser={auth?._id}
                             online={checkOnlineStatus(matchingChat)}
                             notifications={notifications}
                             socket={socket}
@@ -177,7 +181,7 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
                     } else {
                       return (
                         <Box key={member?._id}>
-                          <User socket={socket} currentUser={user?._id} member={member} />
+                          <User socket={socket} currentUser={auth?._id} member={member} />
                         </Box>
                       )
                     }
@@ -207,7 +211,7 @@ const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
                     <ChatBoxComp
                       online={checkOnlineStatus(currentChat)}
                       chat={currentChat}
-                      currentUser={user?._id}
+                      currentUser={auth?._id}
                       socket={socket}
                       editUser={editUser}
                     />

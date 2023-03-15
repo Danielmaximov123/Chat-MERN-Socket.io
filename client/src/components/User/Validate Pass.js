@@ -10,13 +10,13 @@ const ValidatePass = ({validate , setValidate , handleSubmit , userData , bcrypt
     const check = (e) => {
         e.preventDefault()
         if(password.password !== password.confirmPassword) {
-           return toast.error('The passwords do not match' , {position : toast.POSITION.TOP_CENTER})
+           return toast.error('The passwords do not match' , {position : toast.POSITION.BOTTOM_CENTER})
         }
         if(bcrypt.compareSync(password.password, userData.password)) {
             handleSubmit(setValidate , validate)
             setPassword({ password : '' , confirmPassword : '' })
         } else {
-            return toast.error('Authentication failed, please try again.' , {position : toast.POSITION.TOP_CENTER})
+            return toast.error('Authentication failed, please try again.' , {position : toast.POSITION.BOTTOM_CENTER})
         }
     }
 

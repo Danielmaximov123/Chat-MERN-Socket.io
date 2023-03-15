@@ -6,8 +6,11 @@ export const getUser = async (id)  => {
 }
 
 export const getAllUsers = () => async dispatch => {
-    let resp = await axios.get(`${process.env.REACT_APP_URL_API}/user`)
-    dispatch({ type : 'GET_USERS' , payload : resp.data })
+  dispatch({ type : 'USER_LOADING' , payload : true })
+  let resp = await axios.get(`${process.env.REACT_APP_URL_API}/user`)
+
+  await dispatch({ type : 'GET_USERS' , payload : resp.data })
+  dispatch({ type : 'USER_LOADING' , payload : false })
 }
 
 export const updateUser = (id , data , socket) => async dispatch => {

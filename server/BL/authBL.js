@@ -75,7 +75,7 @@ exports.login = (data) => {
     }
 
     const token = jwt.sign({
-        id: user._id,
+        _id: user._id,
         fName : user.fName,
         lName : user.lName,
         displayName : user.displayName,

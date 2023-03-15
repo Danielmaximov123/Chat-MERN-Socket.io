@@ -23,7 +23,7 @@ const ConversationComp = ({
   
   const notificationFind = useMemo(
     () =>
-      notifications.filter((sender) =>
+      notifications?.filter((sender) =>
         sender?.senderId?.includes(
           data.members.find((id) => !id.includes(currentUser))
         )

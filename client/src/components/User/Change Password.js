@@ -16,19 +16,19 @@ const ChangePassword = ({changePass , setChangePass  , user , bcrypt ,}) => {
     const check = async (e) => {
         e.preventDefault()
         if(!isEnglishWord(password.password) || !isEnglishWord(password.confirmPassword)) {
-          return toast.error('The password must be in English letters, numbers and symbols.' , {position : toast.POSITION.TOP_CENTER})
+          return toast.error('The password must be in English letters, numbers and symbols.' , {position : toast.POSITION.BOTTOM_CENTER})
         }
         if(password.password !== password.confirmPassword) {
-           return toast.error('The passwords do not match' , {position : toast.POSITION.TOP_CENTER})
+           return toast.error('The passwords do not match' , {position : toast.POSITION.BOTTOM_CENTER})
         }
         let data = await getChangePasswordUser(user._id , {password : password.password , oldPassword})
         if(data.success) {
           setPassword({ password : '' , confirmPassword : '' })
           setOldPassword('')
-          toast.success(data.message , {position : toast.POSITION.TOP_CENTER})
+          toast.success(data.message , {position : toast.POSITION.BOTTOM_CENTER})
           setChangePass(!changePass)
         } else {
-            return toast.error(data.message , {position : toast.POSITION.TOP_CENTER})
+            return toast.error(data.message , {position : toast.POSITION.BOTTOM_CENTER})
         }
     }
 
