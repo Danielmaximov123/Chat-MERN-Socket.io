@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const authBL = require('../BL/authBL')
-const userBL = require('../BL/userBL')
 const firebase = require('../config/firebase-cloud-helper')
 
 router.route('/register').post(firebase.upload.single('photo') ,async (req , res) => {

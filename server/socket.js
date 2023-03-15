@@ -18,7 +18,8 @@ module.exports = (io) => {
                 console.error(error)
             }
         })
-    
+        
+        io.emit('get-users' , activeUsers)
         // Send Message 
         socket.on('send-message' , data => {
             try {

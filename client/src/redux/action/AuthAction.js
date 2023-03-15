@@ -1,9 +1,14 @@
 import axios from "axios"
 import { toast } from "react-toastify"
 
-export const logIn = (data , newUser) => async (dispatch) => {
+  export const logIn = (data , newUser , checkOnlineUser) => async (dispatch , getState) => {
   dispatch({ type: 'AUTH_LOADING' , payload : true })
-      let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/login` , data)
+  let resp = await axios.post(`${process.env.REACT_APP_URL_API}/auth/login` , data)
+      if(checkOnlineUser.isLogin) {
+        toast.error("The user is already logged in..." , {position : toast.POSITION.TOP_CENTER})
+        dispatch({ type: 'AUTH_LOADING' , payload : false })
+        return;
+      }
       const { success , token , message } = resp.data
       if(success) {
           localStorage.setItem('token' , token)

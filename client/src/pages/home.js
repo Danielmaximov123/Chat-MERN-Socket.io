@@ -5,17 +5,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getChatById, getUserChats } from '../redux/action/ChatAction'
 import ConversationComp from '../components/Conversation/Conversation'
 import ChatBoxComp from '../components/ChatBox/ChatBox'
-import { io } from 'socket.io-client';
-import { getAllUsers } from '../redux/action/UserAction'
 import User from '../components/users/User'
 import UserInMenu from '../components/User/User In Menu'
 import EditUser from '../components/User/Edit User'
 import { push } from '../push'
 import { removeNotification } from '../redux/action/NotificationsAction'
 
-const socket = io.connect(process.env.REACT_APP_URL_API);
 
-const Home = ({ user}) => {
+const Home = ({ user , socket , setOnlineUsers , onlineUsers}) => {
   const dispatch = useDispatch()
   const { chats, users , auth , notifications } = useSelector((state) => ({
     chats: state.chats.chats,
@@ -25,7 +22,6 @@ const Home = ({ user}) => {
   }))
   const [currentChat, setCurrentChat] = useState(null)
   const [chatSelect, setChatSelect] = useState(null)
-  const [onlineUsers, setOnlineUsers] = useState([])
   const [editUser, setEditUser] = useState(false)
   const [usersWithoutMe, setUsersWithoutMe] = useState([])
 
@@ -42,7 +38,6 @@ const Home = ({ user}) => {
 
   // Fetch users and chats only once when the component mounts
   useEffect(() => {
-    dispatch(getAllUsers())
     dispatch(getUserChats(user?._id))
   }, [dispatch, user])
   
@@ -64,25 +59,18 @@ const Home = ({ user}) => {
   // Socket
   useEffect(() => {
     socket.emit('new-user-add', auth?.id)
-    socket.on('get-users', handleGetUsers)
     socket.on('receive-chat', handleReceiveChat)
     socket.on('receive-message', receiveMessage)
     socket.on('user-updated', handleUserUpdated);
     socket.on('notification' , handleNotification)
     
     return () => {
-      socket.off('get-users', handleGetUsers)
       socket.off('receive-chat', handleReceiveChat)
       socket.off('receive-message', receiveMessage)
       socket.off('user-updated', handleUserUpdated)
       socket.off('notification' , handleNotification)
   }
   }, [auth]) 
-
-    // Update the list of users who are currently online
-  const handleGetUsers = useCallback((users) => {
-    setOnlineUsers(users);
-  }, []);
 
     // Receive a new chat from the server
     const handleReceiveChat = useCallback(

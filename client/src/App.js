@@ -4,10 +4,13 @@ import Home from './pages/home'
 import Register from './pages/register'
 import Login from './pages/login'
 import { useSelector, useDispatch } from 'react-redux'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { LoadUser } from './redux/action/AuthAction'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { io } from 'socket.io-client';
+import { getAllUsers } from './redux/action/UserAction'
+const socket = io.connect(process.env.REACT_APP_URL_API);
 
 const App = () => {
   const dispatch = useDispatch()
@@ -15,9 +18,11 @@ const App = () => {
   const { users , userLoading} = useSelector(state => state.users)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [user, setUser] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([])
 
   useEffect(() => {
     dispatch(LoadUser())
+    dispatch(getAllUsers())
   }, [dispatch])
 
   useEffect(() => {
@@ -45,6 +50,19 @@ const App = () => {
     localStorage.removeItem('chatSelect')
   })
 
+  useEffect(() => {
+    const handleGetUsers = (users) => {
+      setOnlineUsers(users);
+    };
+  
+    socket.on('get-users', handleGetUsers);
+    
+    return () => {
+      socket.off('get-users', handleGetUsers)
+    };
+  }, []);
+  
+
   return (
     <Box className="App">
       <ToastContainer autoClose={2000}/>
@@ -53,11 +71,11 @@ const App = () => {
           <Routes>
           <Route
             path="/"
-            element={auth ? <Home user={user} /> : <Navigate to="/login" />}
+            element={auth ? <Home socket={socket} user={user} setOnlineUsers={setOnlineUsers} onlineUsers={onlineUsers} /> : <Navigate to="/login" />}
           />
           <Route
             path="/login"
-            element={!auth ? <Login windowWidth={windowWidth}/> : <Navigate to="/" />}
+            element={!auth ? <Login socket={socket} windowWidth={windowWidth} onlineUsers={onlineUsers}/> : <Navigate to="/" />}
           />
           <Route
             path="/register"

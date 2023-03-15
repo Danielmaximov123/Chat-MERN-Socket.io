@@ -8,15 +8,20 @@ import { Link } from 'react-router-dom'
 import { logIn } from '../redux/action/AuthAction'
 import { useDispatch, useSelector } from 'react-redux'
 
-const Login = ({windowWidth}) => {
+const Login = ({windowWidth , socket , onlineUsers}) => {
   const [visible, setVisible] = useState(false)
-  const loading = useSelector((state) => state.auth.loading);
+  const {loading , users} = useSelector((state) => ({
+    loading : state.auth.loading,
+    users : state.users.users
+  }));
   const [user, setUser] = useState({ email: '', password: '' })
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    dispatch(logIn(user))
+    let userId = users.find(check => check.email === user.email)?._id
+    let checkOnlineUser = onlineUsers.some(user => user.userId === userId) ? { isLogin : true } : { isLogin : false }
+    dispatch(logIn(user , null , checkOnlineUser))
   }
 
   return (
