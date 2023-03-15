@@ -1,4 +1,4 @@
-import { Avatar, Box, IconButton, List, ListItem, ListItemButton, ListItemText, Tooltip } from '@mui/material'
+import { Avatar, IconButton, ListItem, ListItemButton, ListItemText, Tooltip } from '@mui/material'
 import React from 'react'
 import { createChat } from '../../redux/action/ChatAction';
 import { StyledBadge } from './../Custom Style/StyledAvatarDot';

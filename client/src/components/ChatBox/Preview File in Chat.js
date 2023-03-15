@@ -1,13 +1,9 @@
 import {
   Avatar,
   Box,
-  Button,
-  Divider,
-  Link,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -28,7 +24,6 @@ const PreviewFileInChat = ({
 }) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [loading, setLoading] = useState(false);
   const isDocument =
     file?.type.includes("application/msword") ||
     file?.type.includes(
@@ -37,23 +32,19 @@ const PreviewFileInChat = ({
   const isPDF = file.type.includes("application/pdf");
   const isImage = file.type.includes("image");
   const isVideo = file.type.includes("video");
-  const [downloadUrl, setDownloadUrl] = useState("");
 
   useEffect(() => {
     setPageNumber(1);
   }, [file]);
 
   const onDocumentLoadSuccess = () => {
-    setLoading(true);
     setNumPages(numPages);
-    setLoading(false);
   };
 
   const handleDownloadClick = async (file) => {
     const response = await fetch(file.url);
     const blob = await response.blob();
     const objectUrl = URL.createObjectURL(blob);
-    setDownloadUrl(objectUrl);
     const tempLink = document.createElement("a");
     tempLink.href = objectUrl;
     tempLink.setAttribute("download", file.originalname);

@@ -1,5 +1,5 @@
-import { Box, Button, Dialog, DialogContent, IconButton, Slide } from "@mui/material";
-import { forwardRef, useEffect, useState } from "react";
+import { Box, Dialog, DialogContent, IconButton, Slide } from "@mui/material";
+import { forwardRef, useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";

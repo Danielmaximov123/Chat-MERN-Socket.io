@@ -1,13 +1,9 @@
-import { Box, CircularProgress, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useState ,useEffect } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import { useDispatch, useSelector } from 'react-redux';
-import { updateProfilePic } from '../../redux/action/UserAction';
-import { deleteProfilePic } from '../../redux/action/UserAction';
 
 const UploadPhotoRegister = ({ setProfilePic , profilePic}) => {
-  const dispatch = useDispatch()
   const [show, setShow] = useState(false)
   const [showPic, setShowPic] = useState(null)
   const [selectedPic, setSelectedPic] = useState(null)

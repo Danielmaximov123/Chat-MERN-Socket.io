@@ -1,8 +1,6 @@
 import {
   Avatar,
   Badge,
-  Box,
-  CircularProgress,
   ListItem,
   ListItemButton,
   ListItemText,
