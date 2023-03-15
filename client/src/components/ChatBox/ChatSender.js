@@ -132,7 +132,7 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
       // set a timer to clear the typing status after 1 second of inactivity
       setTypingTimer(setTimeout(() => {
         sendTypingStatus(null);
-      }, 1000));
+      }, 250));
     } else {
       sendTypingStatus(null);
     }

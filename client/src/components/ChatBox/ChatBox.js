@@ -74,7 +74,7 @@ const ChatBoxComp = ({ chat, currentUser, online, socket }) => {
   useEffect(() => {
     if (scroll.current) {
       setTimeout(() => {
-        scroll.current.scrollIntoView({ behavior: "smooth" });
+        scroll.current?.scrollIntoView({ behavior: "smooth" });
       }, 250);
     }
   }, [messages]);

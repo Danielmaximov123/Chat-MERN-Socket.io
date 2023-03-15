@@ -87,9 +87,13 @@ const Home = ({ socket , onlineUsers}) => {
       if(!localStorage.getItem('currentChat')) {
          // Show a desktop notification if the chat is not open.
          if('Notification' in window) {
-           const audio = new Audio('https://firebasestorage.googleapis.com/v0/b/chat-42e9b.appspot.com/o/notification.mp3?alt=media&token=5fc83762-f9ff-4d0e-9284-22f2b34b35bb')
-           audio.play();
-         }
+          const audio = new Audio('https://firebasestorage.googleapis.com/v0/b/chat-42e9b.appspot.com/o/notification.mp3?alt=media&token=5fc83762-f9ff-4d0e-9284-22f2b34b35bb')
+          try {
+            await audio.play();
+          } catch (err) {
+            console.log('Failed to play notification sound:', err);
+          }
+        }
         push({
           title : data.findUser.displayName,
           body: data.data.text,
