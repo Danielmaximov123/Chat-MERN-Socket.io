@@ -60,6 +60,15 @@ module.exports = (io) => {
                 console.error(error)
             }
         });
+
+        // User Typing
+        socket.on('user-typing' , (data) => {
+            try {
+                io.emit('typing' , data)
+            } catch (error) {
+                console.error(error);
+            }
+        })
     
         socket.on('disconnect' , () => {
             try {

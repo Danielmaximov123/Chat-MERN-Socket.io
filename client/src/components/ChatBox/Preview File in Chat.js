@@ -7,18 +7,25 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import "react-photo-view/dist/react-photo-view.css";
 import { pdfjs, Document, Page } from "react-pdf";
+import PopUpPreview from "./PopUp preview";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 const docIcon = "https://cdn-icons-png.flaticon.com/512/2932/2932891.png";
 const pdfIcon = "https://cdn-icons-png.flaticon.com/512/2932/2932728.png";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const PreviewFileInChat = ({ file , myUser}) => {
+const PreviewFileInChat = ({
+  file,
+  myUser,
+  setClickMessage,
+  messageId,
+  clickMessage,
+}) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -30,6 +37,7 @@ const PreviewFileInChat = ({ file , myUser}) => {
   const isPDF = file.type.includes("application/pdf");
   const isImage = file.type.includes("image");
   const isVideo = file.type.includes("video");
+  const [downloadUrl, setDownloadUrl] = useState("");
 
   useEffect(() => {
     setPageNumber(1);
@@ -41,31 +49,50 @@ const PreviewFileInChat = ({ file , myUser}) => {
     setLoading(false);
   };
 
-  let button = {
-    color: myUser ? "#07ae12ce" : '#696969ab',
-    borderColor: myUser ? "#07ae12ce" : '#696969ab',
-    width: "48%",
-    "&:hover": { borderColor: myUser ? "#07ae12ce" : '#696969ab' },
+  const handleDownloadClick = async (file) => {
+    const response = await fetch(file.url);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    setDownloadUrl(objectUrl);
+    const tempLink = document.createElement("a");
+    tempLink.href = objectUrl;
+    tempLink.setAttribute("download", file.originalname);
+    tempLink.click();
   };
 
   return (
     <>
       {isImage && (
-        <PhotoProvider maskOpacity={0.5}>
-          <PhotoView src={file.url} zIndex={999}>
             <img
               src={file.url}
               alt={file.filename}
-              style={{ cursor: "pointer" }}
-              width="150px"
+              style={{borderRadius: '1rem 1rem 0rem 0rem' , width : '100%'}}
             />
-          </PhotoView>
-        </PhotoProvider>
+      )}
+      {isVideo && (
+        // <Plyr source={file?.url}/>
+        <Box style={{ position: 'relative', width: '100%', cursor: 'pointer', borderRadius: '1rem 1rem 0rem 0rem', overflow: 'hidden' }}>
+  <video src={file?.url} width="100%" />
+  <Box
+    style={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: 1,
+      color: 'white',
+    }}
+  >
+    <PlayArrowIcon  sx={{ fontSize: '5rem' , color : '#FFFFFF' , backgroundColor : '#28ABFA' , borderRadius : '50%' }} />
+  </Box>
+</Box>
       )}
       {isPDF || isDocument ? (
-        <Box>
-            {
-              isPDF ?
+        <Box
+          sx={{ cursor: isPDF && "pointer", zIndex: "5" }}
+          onClick={() => isPDF && setClickMessage(null)}
+        >
+          {isPDF ? (
             <Document file={file?.url} onLoadSuccess={onDocumentLoadSuccess}>
               <Page
                 pageNumber={pageNumber}
@@ -79,41 +106,40 @@ const PreviewFileInChat = ({ file , myUser}) => {
                   fontFamily: "Helvetica",
                 }}
               />
-            </Document> : null
-            }
-          <ListItem sx={{ paddingLeft: "0.1rem" }}>
+            </Document>
+          ) : null}
+          <ListItem sx={{ paddingLeft: "0.1rem", paddingBottom: "0px" }}>
             <ListItemAvatar>
               <Avatar
                 alt={isPDF ? pdfIcon : docIcon}
                 src={isPDF ? pdfIcon : docIcon}
               />
             </ListItemAvatar>
-            <ListItemText primary={<Typography style={{ fontSize : '0.75rem' , fontWeight : '300' }}>{file.originalname}</Typography>} secondary={<Typography style={{ fontSize : '0.68rem' , fontWeight : '300' }}>{file.size}</Typography>} />
+            <ListItemText
+              primary={
+                <Typography style={{ fontSize: "0.75rem", fontWeight: "300" }}>
+                  {file.originalname}
+                </Typography>
+              }
+              secondary={
+                <Typography style={{ fontSize: "0.68rem", fontWeight: "300" }}>
+                  {file.size}
+                </Typography>
+              }
+            />
           </ListItem>
-          <Divider sx={{ margin: "0.5rem 0rem" }} />
-          <Box sx={{ textAlign: "center" }}>
-            <Button
-              component={Link}
-              href={file.url}
-              target="_blank"
-              download={file.filename}
-              sx={{ ...button, marginRight: "0.3rem" }}
-              variant="outlined"
-            >
-              Save as...
-            </Button>
-            <Button
-              component={Link}
-              href={file.url}
-              target="_blank"
-              sx={{ ...button, marginLeft: "0.3rem" }}
-              variant="outlined"
-            >
-              Open
-            </Button>
-          </Box>
         </Box>
       ) : null}
+      <PopUpPreview
+        file={file}
+        isPDF={isPDF}
+        isImage={isImage}
+        isVideo={isVideo}
+        clickMessage={clickMessage}
+        setClickMessage={setClickMessage}
+        messageId={messageId}
+        handleDownloadClick={handleDownloadClick}
+      />
     </>
   );
 };

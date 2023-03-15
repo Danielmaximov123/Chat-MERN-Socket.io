@@ -9,6 +9,7 @@ import InsertEmoticon from '@mui/icons-material/InsertEmoticon';
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import PreviewFile from './Preview File';
+import { debounce } from 'lodash';
 
 const ChatSenderComp = ({currentUser , chat  , socket}) => {
   const dispatch = useDispatch()
@@ -18,6 +19,7 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
   const [file, setFile] = useState(null)
   const {users} = useSelector((state) => state.users)  
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [typingTimer, setTypingTimer] = useState(null);
 
   const handleSubmit = async  (e) => {
     e.preventDefault()
@@ -50,10 +52,9 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
     }
   }
 
-  const handleFile = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+  const handleFile = (file) => {
+    if (file) {
+      setFile(file);
     }
   }
 
@@ -109,8 +110,13 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
         setRows(Math.min(messageLines.length + 1, 4)); // Update rows based on new message length
     }
   };
+
+  const sendTypingStatus = debounce((data) => {
+    socket.emit('user-typing', data);
+  }, 1000);
   
   const handleInput = (event) => {
+    clearTimeout(typingTimer);
     if (event.target.tagName.toLowerCase() === "input" && event.target.type === "file") {
       return;
     }
@@ -121,11 +127,16 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
       setRows(newRows); // Update rows based on new input length
     }
     setNewMessage(value);
+    if (value) {
+      sendTypingStatus({ chatId : chat._id , senderId : currentUser})
+      // set a timer to clear the typing status after 1 second of inactivity
+      setTypingTimer(setTimeout(() => {
+        sendTypingStatus(null);
+      }, 1000));
+    } else {
+      sendTypingStatus(null);
+    }
   };
-  
-
-  useEffect(() => {
-  }, [newMessage]);
 
   return(
     <Box sx={{ position: 'relative' }}>
@@ -137,33 +148,40 @@ const ChatSenderComp = ({currentUser , chat  , socket}) => {
         <Picker previewPosition="none" theme="light" navPosition="bottom" data={data} onEmojiSelect={onEmojiClick}/> </Box>}
   </Box>
   <Box component='form' onSubmit={handleSubmit} sx={{ padding: '0rem 1rem', display: 'flex' }}>
-  <TextField
-    id='my-text-field'
-    placeholder='Type a message...'
-    sx={{ margin : '1.5rem 1rem 0.8rem 0rem'  , '& .MuiInputBase-root' : { borderRadius : '1.3125rem' }}}
-    value={newMessage}
-    fullWidth
-    multiline
-    rows={Math.min(rows, 4)}
-    onInput={handleInput}
-    onKeyDown={handleKeyDown}
-    InputProps={{
-      endAdornment : (
-        <>
-          <IconButton id="emoji-button" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-            <InsertEmoticon />
-          </IconButton>
-          <IconButton component="label" sx={{ marginLeft: '0.5rem' }}>
-            <input hidden type="file" onChange={handleFile} accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.mp4" />
-            <AttachFileIcon />
-          </IconButton>
-  <IconButton sx={{ backgroundColor : '#07ae12ce' , transition : '0s' , '&:hover': { backgroundColor: '#04870dce' }}} type='submit'>
-    <TelegramIcon sx={{ color : '#FFFFFF' }}/>
-  </IconButton>
-        </>
-      )
-    }}
-  />
+      <TextField
+      id='my-text-field'
+      placeholder='Type a message...'
+      sx={{ margin: '1.5rem 1rem 0.8rem 0rem', '& .MuiInputBase-root': { borderRadius: '1.3125rem' } }}
+      value={newMessage}
+      fullWidth
+      multiline
+      rows={Math.min(rows, 4)}
+      onChange={handleInput}
+      onKeyDown={handleKeyDown}
+      InputProps={{
+        endAdornment: (
+          <>
+            <IconButton id="emoji-button" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+              <InsertEmoticon />
+            </IconButton>
+            <IconButton component="label" sx={{ marginLeft: '0.5rem', marginRight: '0.5rem' }}>
+              <input hidden type="file" onChange={e => handleFile(e.target.files[0])} accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.mp4" />
+              <AttachFileIcon />
+            </IconButton>
+            <IconButton sx={{ backgroundColor: '#07ae12ce', transition: '0s', '&:hover': { backgroundColor: '#04870dce' } }} type='submit'>
+              <TelegramIcon sx={{ color: '#FFFFFF' }} />
+            </IconButton>
+          </>
+        ),
+        onDrop: (e) => {
+          e.preventDefault();
+          handleFile(e.dataTransfer.files[0])
+        },
+        onDragOver: (e) => {
+          e.preventDefault();
+        },
+      }}
+    />
 </Box> 
 </Box> 
   )
