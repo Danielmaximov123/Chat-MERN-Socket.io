@@ -59,12 +59,16 @@ const Home = ({ socket , onlineUsers}) => {
   // Socket
   useEffect(() => {
     socket.emit('new-user-add', auth?._id)
+    socket.on('get-a-new-user', handleNewUser)
+    socket.on('user-deleted', handleDeleteUser)
     socket.on('receive-chat', handleReceiveChat)
     socket.on('receive-message', receiveMessage)
     socket.on('user-updated', handleUserUpdated);
     socket.on('notification' , handleNotification)
     
     return () => {
+      socket.off('get-a-new-user', handleNewUser)
+      socket.off('user-deleted', handleDeleteUser)
       socket.off('receive-chat', handleReceiveChat)
       socket.off('receive-message', receiveMessage)
       socket.off('user-updated', handleUserUpdated)
@@ -79,6 +83,23 @@ const Home = ({ socket , onlineUsers}) => {
         dispatch(getUserChats(auth._id));
       },
       [dispatch, auth]
+    );
+    
+    // Receive a new user from the server
+    const handleNewUser = useCallback(
+      (newUser) => {
+        dispatch({ type: 'ADD_USER', payload : newUser });
+      },
+      [dispatch]
+    );
+    
+    // Delete user
+    const handleDeleteUser = useCallback(
+      (id) => {
+        console.log(id);
+        dispatch({ type: 'DELETE_USER', payload : id });
+      },
+      [dispatch]
     );
 
     // Receive a new message from the server

@@ -213,14 +213,14 @@ const ChatBoxComp = ({ chat, currentUser, online, socket }) => {
                         }
                       </Box>
                       { message?.text && message?.file?.url !== null ? <Divider /> : null }
-                      <Box style={{ maxHeight: "8rem", overflowY: "auto" }}>
+                      <Box style={{ maxHeight: "8rem", overflowY: "auto" , direction : /[\u0590-\u05FF]/.test(message?.text) ? "rtl" : "ltr"}}>
                         <span
                           style={{
                             wordWrap: "break-word",
                             overflowWrap: "break-word",
                             whiteSpace: message?.text?.includes("\n")
                               ? "pre-wrap"
-                              : "initial",
+                              : "initial"
                           }}
                         >
                           {message?.text}

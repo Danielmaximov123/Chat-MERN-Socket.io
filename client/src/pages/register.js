@@ -8,7 +8,7 @@ import { logIn, signUp } from '../redux/action/AuthAction'
 import CustomTextPassField from '../components/Custom Style/customTextPassField'
 import UploadPhotoRegister from '../components/User/Upload Photo Register'
 
-const Register = ({windowWidth}) => {
+const Register = ({windowWidth , socket}) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [user, setUser] = useState({ email: '', fName: '' , lName : '' , password: '' })
@@ -19,7 +19,8 @@ const Register = ({windowWidth}) => {
     let form = new FormData()
     form.append('photo' , profilePic)
     form.append('data' , JSON.stringify(user))
-    dispatch(signUp(form , user))
+    let getUser = await dispatch(signUp(form , user))
+    socket.emit('add-new-user' , getUser)
   }
 
   return (

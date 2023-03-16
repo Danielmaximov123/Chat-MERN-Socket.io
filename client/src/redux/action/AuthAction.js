@@ -68,6 +68,7 @@ export const signUp = (data, user) => async (dispatch) => {
     };
     dispatch(logIn(loginData, null , 'newUser'));
     dispatch({ type: "AUTH_LOADING", payload: false });
+    return getUser
   } else {
     toast.error(message, { position: toast.POSITION.BOTTOM_CENTER });
     dispatch({ type: "AUTH_LOADING", payload: false });

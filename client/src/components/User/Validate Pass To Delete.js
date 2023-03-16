@@ -4,7 +4,7 @@ import CustomTextPassField from '../Custom Style/customTextPassField';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
 
-const ValidatePassToDelete = ({deleteUser , setDeleteUser , handleDelete , userData , bcrypt}) => {
+const ValidatePassToDelete = ({deleteUser , setDeleteUser , handleDelete , userData , bcrypt , socket}) => {
     const [password, setPassword] = useState({ password : '' , confirmPassword : '' })
     const [agree, setAgree] = useState(false)
 

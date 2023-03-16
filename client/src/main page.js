@@ -49,7 +49,7 @@ const MainPage = () => {
           />
           <Route
             path="/register"
-            element={!auth ? <Register windowWidth={windowWidth}/> : <Navigate to="/" />}
+            element={!auth ? <Register windowWidth={windowWidth} socket={socket}/> : <Navigate to="/" />}
           />
         </Routes>
     </>

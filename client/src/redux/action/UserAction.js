@@ -21,11 +21,10 @@ export const updateUser = (id , data , socket) => async dispatch => {
     dispatch({ type : 'LOADING_USER_UPDATE' , payload : false })  
 }
 
-export const deleteMyUser = (id , socket) => async dispatch => {
+export const deleteMyUser = (id) => async dispatch => {
     await axios.delete(`${process.env.REACT_APP_URL_API}/user/${id}`);
     dispatch({ type: 'DELETE_USER' , payload : id })
     dispatch({type : 'LOGOUT_AUTH'}); 
-    socket.emit('user-logout', id)
   }
 
 export const updateProfilePic = (id , pic , socket) => async dispatch => {

@@ -9,7 +9,7 @@ import ChangePassword from './Change Password';
 import ValidatePassToDelete from './Validate Pass To Delete';
 
 const EditUser = ({socket}) => {
-  const { loadingUpdate , users } = useSelector(state => state.users)
+  const { loadingUpdate } = useSelector(state => state.users)
   const { auth } = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const [userData, setUserData] = useState({
@@ -42,7 +42,9 @@ const EditUser = ({socket}) => {
     }
 
     const handleDelete = () => {
-      dispatch(deleteMyUser(auth._id , socket))
+      dispatch(deleteMyUser(auth._id))
+      socket.emit('user-logout', auth._id)
+      socket.emit('delete-user', auth._id)
     }
 
     useEffect(() => {
@@ -126,7 +128,7 @@ const EditUser = ({socket}) => {
         </Grid>
         </Box>
         <ValidatePass bcrypt={bcrypt} validate={validate} setValidate={setValidate} handleSubmit={handleSubmit} userData={userData}/>
-        <ValidatePassToDelete bcrypt={bcrypt} deleteUser={deleteUser} setDeleteUser={setDeleteUser} handleDelete={handleDelete} userData={userData}/>
+        <ValidatePassToDelete socket={socket} bcrypt={bcrypt} deleteUser={deleteUser} setDeleteUser={setDeleteUser} handleDelete={handleDelete} userData={userData}/>
         <ChangePassword bcrypt={bcrypt} changePass={changePass} setChangePass={setChangePass} setUserData={setUserData} user={auth}/>
     </Box>
   )

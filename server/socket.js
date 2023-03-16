@@ -19,7 +19,9 @@ module.exports = (io) => {
             }
         })
         
+        // Get All users from socket
         io.emit('get-users' , activeUsers)
+
         // Send Message 
         socket.on('send-message' , data => {
             try {
@@ -33,11 +35,29 @@ module.exports = (io) => {
                 console.error(error)
             }
         })
-    
+
+        // New User
+        socket.on('add-new-user' , (newUser) => {
+            try {
+                io.emit('get-a-new-user' , newUser)
+            } catch (error) {
+                console.error(error)
+            }
+        })
+
         // Update User
         socket.on('update-user-details' , updatedUser => {
             try {
                 io.emit('user-updated' , updatedUser)
+            } catch (error) {
+                console.error(error)
+            }
+        })
+
+        // Delete User
+        socket.on('delete-user' , id => {
+            try {
+                io.emit('user-deleted' , id)
             } catch (error) {
                 console.error(error)
             }
